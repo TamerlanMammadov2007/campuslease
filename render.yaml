@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: campuslease-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_PATH
+        value: /var/data/campuslease.db
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_EMAIL
+        value: tomik20072072@gmail.com
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: COOKIE_SECURE
+        value: true
+    disk:
+      name: campuslease-data
+      mountPath: /var/data
+      sizeGB: 1
