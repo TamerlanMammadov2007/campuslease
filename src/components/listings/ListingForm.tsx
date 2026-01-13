@@ -1,5 +1,6 @@
 import React from "react"
 import { MapPin, Plus, UploadCloud, X } from "lucide-react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -7,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import type { Property } from "@/data/types"
+import { supabase } from "@/lib/supabase"
 
 type ListingFormProps = {
   initial: Property
@@ -37,6 +39,7 @@ export function ListingForm({ initial, onSubmit, submitLabel }: ListingFormProps
   const [draft, setDraft] = React.useState<Property>(initial)
   const [amenityInput, setAmenityInput] = React.useState("")
   const [imageInput, setImageInput] = React.useState("")
+  const [isUploading, setIsUploading] = React.useState(false)
 
   const addAmenity = (value?: string) => {
     const next = (value ?? amenityInput).trim()
@@ -61,16 +64,36 @@ export function ListingForm({ initial, onSubmit, submitLabel }: ListingFormProps
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (!files || files.length === 0) return
+    if (!draft.ownerId) {
+      toast.error("Please sign in to upload photos.")
+      event.target.value = ""
+      return
+    }
+    setIsUploading(true)
     try {
       const urls = await Promise.all(
-        Array.from(files).map((file) => readFileAsDataUrl(file)),
+        Array.from(files).map(async (file) => {
+          const safeName = file.name.replace(/\s+/g, "-")
+          const path = `${draft.ownerId}/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}`
+          const { error } = await supabase.storage.from("listing-images").upload(path, file, {
+            cacheControl: "3600",
+            upsert: false,
+          })
+          if (error) throw error
+          const { data } = supabase.storage.from("listing-images").getPublicUrl(path)
+          return data.publicUrl
+        }),
       )
       setDraft((prev) => ({
         ...prev,
         images: [...prev.images, ...urls],
       }))
-    } catch {
-      // Ignore file read failures.
+      toast.success("Photos uploaded.")
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to upload images."
+      toast.error(message)
+    } finally {
+      setIsUploading(false)
     }
     event.target.value = ""
   }
@@ -371,12 +394,13 @@ export function ListingForm({ initial, onSubmit, submitLabel }: ListingFormProps
           <div className="grid gap-4 md:grid-cols-2">
             <label className="flex h-36 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/20 bg-white/5 text-xs text-slate-300">
               <UploadCloud size={18} />
-              Drop photos or click to upload
+              {isUploading ? "Uploading photos..." : "Drop photos or click to upload"}
               <input
                 type="file"
                 accept="image/*"
                 multiple
                 onChange={handleFileUpload}
+                disabled={isUploading}
                 className="hidden"
               />
             </label>
@@ -465,13 +489,4 @@ export function ListingForm({ initial, onSubmit, submitLabel }: ListingFormProps
       </CardContent>
     </Card>
   )
-}
-
-function readFileAsDataUrl(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(String(reader.result ?? ""))
-    reader.onerror = () => reject(reader.error ?? new Error("Failed to read file"))
-    reader.readAsDataURL(file)
-  })
 }

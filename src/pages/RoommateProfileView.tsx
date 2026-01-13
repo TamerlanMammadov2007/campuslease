@@ -31,10 +31,15 @@ export function RoommateProfileView() {
       navigate("/login")
       return
     }
+    if (!profile.userId) {
+      toast.error("Roommate profile is missing a user account.")
+      return
+    }
     try {
       await createThread({
+        participantId: profile.userId,
         participantName: profile.name,
-        participantEmail: `${profile.name.toLowerCase().replace(" ", ".")}@campuslease.com`,
+        participantEmail: "",
         message: `Hi ${profile.name}, I'd love to chat about housing options.`,
       })
       toast.success("Message sent. Check your inbox for replies.")

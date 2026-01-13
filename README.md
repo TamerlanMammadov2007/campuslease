@@ -1,5 +1,20 @@
 # React + TypeScript + Vite
 
+## Supabase setup (CampusLease)
+
+1) Create a Supabase project and open the SQL editor.
+2) Run `supabase/schema.sql` to create tables, triggers, and RLS policies.
+3) Add your keys to `.env`:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+4) The SQL also creates a public `listing-images` storage bucket and policies.
+5) Enable realtime on the `messages` table in Supabase (Database > Replication).
+6) Install deps and run the app:
+   - `npm install`
+   - `npm run dev`
+
+To grant admin access, set `profiles.is_admin = true` for your user in Supabase.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

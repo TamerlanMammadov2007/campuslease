@@ -11,7 +11,7 @@ export function EditListing() {
   const { id } = useParams()
   const { data: listing, isLoading } = useProperty(id)
   const { mutateAsync: updateListing } = useUpdateListing()
-  const { currentUserEmail } = useApp()
+  const { currentUserId } = useApp()
   const navigate = useNavigate()
 
   if (isLoading) {
@@ -30,7 +30,7 @@ export function EditListing() {
     )
   }
 
-  if (listing.owner?.email !== currentUserEmail) {
+  if (listing.ownerId !== currentUserId) {
     return (
       <Card>
         <CardContent className="text-white">

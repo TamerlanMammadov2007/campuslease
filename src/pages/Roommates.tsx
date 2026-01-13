@@ -67,13 +67,17 @@ const defaultProfile: RoommateProfile = {
 }
 
 export function Roommates() {
-  const { roommateProfile, setRoommateProfile } = useApp()
+  const { roommateProfile, setRoommateProfile, isAuthenticated } = useApp()
   const [draft, setDraft] = React.useState<RoommateProfile>(
     roommateProfile ?? defaultProfile,
   )
   const [filters, setFilters] = React.useState(defaultFilters)
   const { data: profiles = [] } = useRoommates()
   const [locationInput, setLocationInput] = React.useState("")
+
+  React.useEffect(() => {
+    setDraft(roommateProfile ?? defaultProfile)
+  }, [roommateProfile])
 
   const filtered = profiles
     .filter((profile) =>
@@ -118,9 +122,17 @@ export function Roommates() {
     }))
   }
 
-  const handleSaveProfile = () => {
-    setRoommateProfile(draft)
-    toast.success("Roommate profile saved.")
+  const handleSaveProfile = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please log in to save your roommate profile.")
+      return
+    }
+    try {
+      await setRoommateProfile(draft)
+      toast.success("Roommate profile saved.")
+    } catch {
+      toast.error("Failed to save roommate profile.")
+    }
   }
 
   if (!roommateProfile) {

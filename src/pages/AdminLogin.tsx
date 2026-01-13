@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { SectionHeader } from "@/components/SectionHeader"
-import { apiBase, fetchJson } from "@/lib/api"
+import { supabase } from "@/lib/supabase"
 
 export function AdminLogin() {
   const navigate = useNavigate()
@@ -15,18 +15,35 @@ export function AdminLogin() {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   React.useEffect(() => {
-    fetchJson(`${apiBase}/admin/logout`, { method: "POST" }).catch(() => {
-      // Ignore logout errors.
-    })
+    void supabase.auth.signOut()
   }, [])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     setIsSubmitting(true)
     try {
-      await fetchJson(`${apiBase}/admin/login`, {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      if (error) throw error
+      const user = data.user
+      if (!user) {
+        throw new Error("Admin login failed.")
+      }
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_admin,email")
+        .eq("id", user.id)
+        .maybeSingle()
+      if (!profile?.is_admin) {
+        await supabase.auth.signOut()
+        throw new Error("Admin access required.")
+      }
+      await supabase.from("admin_login_events").insert({
+        user_id: user.id,
+        email: profile.email,
+        event_type: "login",
       })
       toast.success("Admin access granted.")
       navigate("/admin", { replace: true })

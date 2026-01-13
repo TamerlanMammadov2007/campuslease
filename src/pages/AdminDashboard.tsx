@@ -15,7 +15,7 @@ import {
   useAdminUpdateUser,
   useAdminUsers,
 } from "@/hooks/useAdmin"
-import { apiBase, fetchJson } from "@/lib/api"
+import { supabase } from "@/lib/supabase"
 
 export function AdminDashboard() {
   const { data: stats } = useAdminStats()
@@ -36,11 +36,9 @@ export function AdminDashboard() {
     price: 0,
     status: "available",
   })
-  const [editingUserId, setEditingUserId] = React.useState<number | null>(null)
+  const [editingUserId, setEditingUserId] = React.useState<string | null>(null)
   const [userDraft, setUserDraft] = React.useState({
     name: "",
-    email: "",
-    password: "",
   })
 
   const summaryCards = useMemo(
@@ -55,14 +53,31 @@ export function AdminDashboard() {
   )
 
   React.useEffect(() => {
-    fetchJson<{ email: string }>(`${apiBase}/admin/me`)
-      .then((user) => setAdminEmail(user.email))
-      .catch(() => setAdminEmail(""))
+    const loadAdmin = async () => {
+      const { data } = await supabase.auth.getUser()
+      const user = data.user
+      if (!user) {
+        setAdminEmail("")
+        return
+      }
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("email")
+        .eq("id", user.id)
+        .maybeSingle()
+      setAdminEmail(profile?.email ?? "")
+    }
+    void loadAdmin()
   }, [])
 
   const handleLogout = async () => {
     try {
-      await fetchJson(`${apiBase}/admin/logout`, { method: "POST" })
+      await supabase.from("admin_login_events").insert({
+        user_id: null,
+        email: adminEmail,
+        event_type: "logout",
+      })
+      await supabase.auth.signOut()
       window.location.href = "/admin/login"
     } catch (error) {
       const message =
@@ -85,8 +100,6 @@ export function AdminDashboard() {
     setEditingUserId(user.id)
     setUserDraft({
       name: user.name,
-      email: user.email,
-      password: "",
     })
   }
 
@@ -129,8 +142,6 @@ export function AdminDashboard() {
         id: editingUserId,
         data: {
           name: userDraft.name,
-          email: userDraft.email,
-          password: userDraft.password || undefined,
         },
       })
       toast.success("User updated.")
@@ -187,22 +198,6 @@ export function AdminDashboard() {
                       value={userDraft.name}
                       onChange={(event) =>
                         setUserDraft((prev) => ({ ...prev, name: event.target.value }))
-                      }
-                    />
-                    <input
-                      className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
-                      value={userDraft.email}
-                      onChange={(event) =>
-                        setUserDraft((prev) => ({ ...prev, email: event.target.value }))
-                      }
-                    />
-                    <input
-                      type="password"
-                      className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
-                      placeholder="New password (optional)"
-                      value={userDraft.password}
-                      onChange={(event) =>
-                        setUserDraft((prev) => ({ ...prev, password: event.target.value }))
                       }
                     />
                     <div className="flex gap-2">

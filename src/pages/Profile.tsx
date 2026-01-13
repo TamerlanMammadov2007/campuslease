@@ -7,8 +7,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { useLocalStorage } from "@/hooks/useLocalStorage"
 import { useApp } from "@/context/AppContext"
+import { supabase } from "@/lib/supabase"
 
 type ProfileState = {
   name: string
@@ -49,11 +49,8 @@ const defaultProfile: ProfileState = {
 const propertyTypeOptions = ["Apartment", "House", "Studio", "Townhome"]
 
 export function Profile() {
-  const { currentUserEmail, currentUserName } = useApp()
-  const [profile, setProfile] = useLocalStorage<ProfileState>(
-    "campuslease:profile",
-    defaultProfile,
-  )
+  const { currentUserEmail, currentUserName, currentUserId } = useApp()
+  const [profile, setProfile] = React.useState<ProfileState>(defaultProfile)
   const [cityInput, setCityInput] = React.useState("")
 
   React.useEffect(() => {
@@ -62,7 +59,38 @@ export function Profile() {
       name: currentUserName,
       email: currentUserEmail,
     }))
-  }, [currentUserEmail, currentUserName, setProfile])
+  }, [currentUserEmail, currentUserName])
+
+  React.useEffect(() => {
+    const loadProfile = async () => {
+      if (!currentUserId) return
+      const { data, error } = await supabase
+        .from("profiles")
+        .select(
+          "phone,bio,university,grad_year,lease_duration,move_in_date,property_types,preferred_cities,parking,budget_min,budget_max,has_pets,pet_type",
+        )
+        .eq("id", currentUserId)
+        .maybeSingle()
+      if (error || !data) return
+      setProfile((prev) => ({
+        ...prev,
+        phone: data.phone ?? "",
+        bio: data.bio ?? "",
+        university: data.university ?? "",
+        gradYear: data.grad_year ?? "",
+        leaseDuration: data.lease_duration ?? "12 months",
+        moveInDate: data.move_in_date ?? "",
+        propertyTypes: data.property_types ?? [],
+        preferredCities: data.preferred_cities ?? [],
+        parking: data.parking ?? false,
+        budgetMin: data.budget_min ?? 900,
+        budgetMax: data.budget_max ?? 1800,
+        hasPets: data.has_pets ?? false,
+        petType: data.pet_type ?? "",
+      }))
+    }
+    void loadProfile()
+  }, [currentUserId])
 
   const togglePropertyType = (type: string) => {
     setProfile((prev) => ({
@@ -89,7 +117,35 @@ export function Profile() {
     }))
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!currentUserId) return
+    const { error } = await supabase
+      .from("profiles")
+      .upsert(
+        {
+          id: currentUserId,
+          name: currentUserName,
+          email: currentUserEmail,
+          phone: profile.phone,
+          bio: profile.bio,
+          university: profile.university,
+          grad_year: profile.gradYear,
+          lease_duration: profile.leaseDuration,
+          move_in_date: profile.moveInDate || null,
+          property_types: profile.propertyTypes,
+          preferred_cities: profile.preferredCities,
+          parking: profile.parking,
+          budget_min: profile.budgetMin,
+          budget_max: profile.budgetMax,
+          has_pets: profile.hasPets,
+          pet_type: profile.petType,
+        },
+        { onConflict: "id" },
+      )
+    if (error) {
+      toast.error("Failed to update profile.")
+      return
+    }
     toast.success("Profile updated successfully.")
   }
 

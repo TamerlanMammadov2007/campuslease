@@ -1,13 +1,36 @@
+import React from "react"
 import { Link } from "react-router-dom"
 import { Building2, MessageSquare } from "lucide-react"
+import { useQueryClient } from "@tanstack/react-query"
 
 import { SectionHeader } from "@/components/SectionHeader"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useThreads } from "@/hooks/useThreads"
+import { useApp } from "@/context/AppContext"
+import { supabase } from "@/lib/supabase"
 
 export function Inbox() {
   const { data: threads = [], isLoading } = useThreads()
+  const { currentUserId } = useApp()
+  const queryClient = useQueryClient()
+
+  React.useEffect(() => {
+    if (!currentUserId) return
+    const channel = supabase
+      .channel(`inbox-${currentUserId}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "messages", filter: `recipient_id=eq.${currentUserId}` },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["threads"] })
+        },
+      )
+      .subscribe()
+    return () => {
+      void supabase.removeChannel(channel)
+    }
+  }, [currentUserId, queryClient])
 
   if (isLoading) {
     return (

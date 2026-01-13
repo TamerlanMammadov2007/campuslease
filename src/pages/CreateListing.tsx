@@ -8,7 +8,7 @@ import { useApp } from "@/context/AppContext"
 import type { Property } from "@/data/types"
 import { useCreateListing } from "@/hooks/useProperties"
 
-const createEmptyListing = (name: string, email: string): Property => ({
+const createEmptyListing = (name: string, email: string, ownerId: string): Property => ({
   id: "",
   title: "",
   address: "",
@@ -31,6 +31,7 @@ const createEmptyListing = (name: string, email: string): Property => ({
     email,
     phone: "555-000-0000",
   },
+  ownerId,
   status: "available",
   coordinates: {
     lat: 30.2849,
@@ -42,11 +43,11 @@ const createEmptyListing = (name: string, email: string): Property => ({
 
 export function CreateListing() {
   const { mutateAsync: createListing } = useCreateListing()
-  const { currentUserEmail, currentUserName } = useApp()
+  const { currentUserEmail, currentUserName, currentUserId } = useApp()
   const navigate = useNavigate()
   const emptyListing = React.useMemo(
-    () => createEmptyListing(currentUserName, currentUserEmail),
-    [currentUserEmail, currentUserName],
+    () => createEmptyListing(currentUserName, currentUserEmail, currentUserId),
+    [currentUserEmail, currentUserId, currentUserName],
   )
 
   const handleSubmit = async (property: Property) => {

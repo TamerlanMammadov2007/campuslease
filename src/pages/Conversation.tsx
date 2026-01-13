@@ -1,12 +1,14 @@
 import React from "react"
 import { useParams } from "react-router-dom"
 import { toast } from "sonner"
+import { useQueryClient } from "@tanstack/react-query"
 
 import { SectionHeader } from "@/components/SectionHeader"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useMarkThreadRead, useSendMessage, useThread } from "@/hooks/useThreads"
+import { supabase } from "@/lib/supabase"
 
 export function Conversation() {
   const { threadId } = useParams()
@@ -15,12 +17,32 @@ export function Conversation() {
   const { mutateAsync: markThreadRead } = useMarkThreadRead()
   const [message, setMessage] = React.useState("")
   const bottomRef = React.useRef<HTMLDivElement | null>(null)
+  const queryClient = useQueryClient()
 
   React.useEffect(() => {
     if (threadId) {
       void markThreadRead(threadId)
     }
   }, [threadId, markThreadRead])
+
+  React.useEffect(() => {
+    if (!threadId) return
+    const channel = supabase
+      .channel(`thread-${threadId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "messages", filter: `thread_id=eq.${threadId}` },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["thread", threadId] })
+          queryClient.invalidateQueries({ queryKey: ["threads"] })
+        },
+      )
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(channel)
+    }
+  }, [threadId, queryClient])
 
   React.useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })

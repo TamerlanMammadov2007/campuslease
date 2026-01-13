@@ -11,9 +11,9 @@ import { useApp } from "@/context/AppContext"
 export function MyListings() {
   const { data: listings = [], isLoading } = useProperties()
   const { mutateAsync: deleteListing } = useDeleteListing()
-  const { currentUserEmail } = useApp()
+  const { currentUserId } = useApp()
   const ownedListings = listings.filter(
-    (listing) => listing.owner?.email === currentUserEmail,
+    (listing) => listing.ownerId === currentUserId,
   )
 
   return (

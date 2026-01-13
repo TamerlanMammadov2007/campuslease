@@ -23,6 +23,7 @@ export type Property = {
     email: string
     phone: string
   }
+  ownerId?: string
   status: PropertyStatus
   coordinates: {
     lat: number
@@ -34,6 +35,7 @@ export type Property = {
 
 export type RoommateProfile = {
   id: string
+  userId?: string
   name: string
   age: number
   gender: string

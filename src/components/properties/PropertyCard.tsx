@@ -14,7 +14,7 @@ type PropertyCardProps = {
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
-  const { favorites, toggleFavorite, compareIds, toggleCompare } = useApp()
+  const { favorites, toggleFavorite, compareIds, toggleCompare, isAuthenticated } = useApp()
   const isFavorite = favorites.includes(property.id)
   const isCompared = compareIds.includes(property.id)
   const compareDisabled = !isCompared && compareIds.length >= 4
@@ -40,10 +40,12 @@ export function PropertyCard({ property }: PropertyCardProps) {
             isFavorite && "bg-rose-500/90 text-white",
           )}
           onClick={() => {
+            if (!isAuthenticated) {
+              toast.error("Please log in to save favorites.")
+              return
+            }
             toggleFavorite(property.id)
-            toast(
-              isFavorite ? "Removed from favorites." : "Saved to favorites.",
-            )
+            toast(isFavorite ? "Removed from favorites." : "Saved to favorites.")
           }}
           aria-label="Toggle favorite"
         >
@@ -78,9 +80,15 @@ export function PropertyCard({ property }: PropertyCardProps) {
           <Button asChild size="sm" variant="outline">
             <Link to={`/properties/${property.id}`}>View Details</Link>
           </Button>
-          <button
-            onClick={() => toggleCompare(property.id)}
-            className={cn(
+        <button
+          onClick={() => {
+            if (!isAuthenticated) {
+              toast.error("Please log in to compare listings.")
+              return
+            }
+            toggleCompare(property.id)
+          }}
+          className={cn(
               "flex items-center gap-2 rounded-full border border-white/20 px-3 py-2 text-xs text-white transition",
               isCompared && "border-orange-300/80 bg-orange-400/20 text-orange-100",
               compareDisabled && "cursor-not-allowed opacity-40",

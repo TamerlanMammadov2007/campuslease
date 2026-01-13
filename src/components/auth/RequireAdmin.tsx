@@ -1,36 +1,43 @@
 import React from "react"
 import { Navigate } from "react-router-dom"
 
-import { apiBase, fetchJson } from "@/lib/api"
-
-type AdminUser = {
-  email: string
-  role: string
-}
+import { supabase } from "@/lib/supabase"
 
 export function RequireAdmin({ children }: { children: React.ReactNode }) {
-  const [adminUser, setAdminUser] = React.useState<AdminUser | null>(null)
+  const [isAdmin, setIsAdmin] = React.useState(false)
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
     let mounted = true
-    fetchJson<AdminUser | undefined>(`${apiBase}/admin/me`, undefined, {
-      allow401: true,
+    const checkAdmin = async () => {
+      const { data } = await supabase.auth.getUser()
+      const user = data.user
+      if (!user) {
+        if (mounted) {
+          setIsAdmin(false)
+          setLoading(false)
+        }
+        return
+      }
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .maybeSingle()
+      if (mounted) {
+        setIsAdmin(Boolean(profile?.is_admin))
+        setLoading(false)
+      }
+    }
+    void checkAdmin()
+
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      void checkAdmin()
     })
-      .then((user) => {
-        if (mounted) {
-          setAdminUser(user ?? null)
-          setLoading(false)
-        }
-      })
-      .catch(() => {
-        if (mounted) {
-          setAdminUser(null)
-          setLoading(false)
-        }
-      })
+
     return () => {
       mounted = false
+      listener.subscription.unsubscribe()
     }
   }, [])
 
@@ -42,7 +49,7 @@ export function RequireAdmin({ children }: { children: React.ReactNode }) {
     )
   }
 
-  if (!adminUser) {
+  if (!isAdmin) {
     return <Navigate to="/admin/login" replace />
   }
 

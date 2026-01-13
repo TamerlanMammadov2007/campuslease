@@ -15,21 +15,28 @@ export function Register() {
   const [email, setEmail] = React.useState("")
   const [password, setPassword] = React.useState("")
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [awaitingConfirmation, setAwaitingConfirmation] = React.useState(false)
 
   React.useEffect(() => {
+    if (awaitingConfirmation) return
     if (!authLoading && isAuthenticated) {
       navigate("/browse")
     }
-  }, [authLoading, isAuthenticated, navigate])
+  }, [authLoading, isAuthenticated, navigate, awaitingConfirmation])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!name || !email || !password) return
     setIsSubmitting(true)
     try {
-      await register(name, email, password)
-      toast.success("Account created.")
-      navigate("/browse")
+      const result = await register(name, email, password)
+      if (result.requiresEmailConfirmation) {
+        setAwaitingConfirmation(true)
+        toast.success("Check your email to confirm your account before logging in.")
+      } else {
+        toast.success("Account created.")
+        navigate("/browse")
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Registration failed. Try again."
