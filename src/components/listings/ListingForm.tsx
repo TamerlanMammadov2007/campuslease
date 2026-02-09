@@ -14,6 +14,8 @@ type ListingFormProps = {
   initial: Property
   onSubmit: (property: Property) => void
   submitLabel: string
+  submitDisabled?: boolean
+  submitHint?: string
 }
 
 const amenitySuggestions = [
@@ -35,7 +37,13 @@ const propertyTypes: Property["type"][] = [
   "Townhome",
 ]
 
-export function ListingForm({ initial, onSubmit, submitLabel }: ListingFormProps) {
+export function ListingForm({
+  initial,
+  onSubmit,
+  submitLabel,
+  submitDisabled = false,
+  submitHint,
+}: ListingFormProps) {
   const [draft, setDraft] = React.useState<Property>(initial)
   const [amenityInput, setAmenityInput] = React.useState("")
   const [imageInput, setImageInput] = React.useState("")
@@ -485,7 +493,14 @@ export function ListingForm({ initial, onSubmit, submitLabel }: ListingFormProps
           </div>
         </div>
 
-        <Button onClick={() => onSubmit(draft)}>{submitLabel}</Button>
+        <div className="space-y-2">
+          <Button onClick={() => onSubmit(draft)} disabled={submitDisabled}>
+            {submitLabel}
+          </Button>
+          {submitHint ? (
+            <p className="text-xs text-slate-300">{submitHint}</p>
+          ) : null}
+        </div>
       </CardContent>
     </Card>
   )

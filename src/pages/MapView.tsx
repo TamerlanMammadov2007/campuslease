@@ -1,6 +1,5 @@
 import React from "react"
-import L from "leaflet"
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet"
+import { GoogleMap, InfoWindow, Marker, useLoadScript } from "@react-google-maps/api"
 import { Link } from "react-router-dom"
 
 import { PropertyFilters } from "@/components/properties/PropertyFilters"
@@ -26,7 +25,10 @@ export function MapView() {
   const { data: properties = [] } = useProperties()
   const [filters, setFilters] = React.useState(defaultFilters)
   const [selectedId, setSelectedId] = React.useState<string | null>(null)
-  const iconCache = React.useRef(new Map<string, L.DivIcon>())
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: apiKey ?? "",
+  })
 
   const filtered = properties.filter((property) => {
     if (
@@ -66,70 +68,88 @@ export function MapView() {
   const defaultImage =
     "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=300&auto=format&fit=crop"
 
-  const getMarkerIcon = (url?: string) => {
-    const safeUrl = (url || defaultImage).replace(/'/g, "%27")
-    if (iconCache.current.has(safeUrl)) {
-      return iconCache.current.get(safeUrl)!
-    }
-    const icon = L.divIcon({
-      className: "listing-marker",
-      html: `<div class="listing-marker-thumb" style="background-image:url('${safeUrl}')"></div>`,
-      iconSize: [54, 54],
-      iconAnchor: [27, 54],
-      popupAnchor: [0, -50],
-    })
-    iconCache.current.set(safeUrl, icon)
-    return icon
-  }
+  const getMarkerIcon = React.useCallback(
+    (url?: string) => {
+      const maps = (window as any).google?.maps
+      if (!maps) return undefined
+      const safeUrl = (url || defaultImage).replace(/'/g, "%27")
+      return {
+        url: safeUrl,
+        scaledSize: new maps.Size(54, 54),
+        anchor: new maps.Point(27, 54),
+      }
+    },
+    [defaultImage],
+  )
 
   return (
     <div className="space-y-6">
       <PropertyFilters value={filters} onChange={setFilters} />
       <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
         <div className="h-[520px] overflow-hidden rounded-3xl border border-white/10">
-          <MapContainer
-            key={`${mapCenter.lat}-${mapCenter.lng}`}
-            center={[mapCenter.lat, mapCenter.lng]}
-            zoom={11}
-            className="h-full w-full"
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {filtered.map((property) => (
-              <Marker
-                key={property.id}
-                position={[property.coordinates.lat, property.coordinates.lng]}
-                icon={getMarkerIcon(property.images[0])}
-                eventHandlers={{
-                  click: () => setSelectedId(property.id),
-                }}
-              >
-                <Popup>
+          {!apiKey ? (
+            <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-300">
+              Add VITE_GOOGLE_MAPS_API_KEY to your .env file to load Google
+              Maps.
+            </div>
+          ) : loadError ? (
+            <div className="flex h-full items-center justify-center px-6 text-center text-sm text-red-200">
+              Google Maps failed to load. Check your API key and billing
+              settings.
+            </div>
+          ) : !isLoaded ? (
+            <div className="flex h-full items-center justify-center text-sm text-slate-300">
+              Loading map...
+            </div>
+          ) : (
+            <GoogleMap
+              key={`${mapCenter.lat}-${mapCenter.lng}`}
+              center={mapCenter}
+              zoom={11}
+              mapContainerClassName="h-full w-full"
+              options={{
+                clickableIcons: false,
+                streetViewControl: false,
+                mapTypeControl: false,
+                fullscreenControl: false,
+              }}
+            >
+              {filtered.map((property) => (
+                <Marker
+                  key={property.id}
+                  position={property.coordinates}
+                  icon={getMarkerIcon(property.images[0])}
+                  onClick={() => setSelectedId(property.id)}
+                />
+              ))}
+              {selected ? (
+                <InfoWindow
+                  position={selected.coordinates}
+                  onCloseClick={() => setSelectedId(null)}
+                >
                   <div className="space-y-2">
                     <img
                       src={
-                        property.images[0] ??
+                        selected.images[0] ??
                         "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop"
                       }
-                      alt={property.title}
+                      alt={selected.title}
                       className="h-20 w-full rounded-lg object-cover"
                     />
                     <div className="text-sm font-semibold">
-                      {property.title}
+                      {selected.title}
                     </div>
                     <div className="text-xs text-slate-600">
-                      {property.address}, {property.city}
+                      {selected.address}, {selected.city}
                     </div>
                     <div className="text-xs font-semibold text-orange-600">
-                      ${property.price}/mo
+                      ${selected.price}/mo
                     </div>
                   </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+                </InfoWindow>
+              ) : null}
+            </GoogleMap>
+          )}
         </div>
         <div className="space-y-4">
           {selected ? (
