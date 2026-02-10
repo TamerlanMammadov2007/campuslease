@@ -25,6 +25,7 @@ type PayPalButtonsOptions = {
     actions: PayPalButtonsActions,
   ) => Promise<void>
   onError?: (error: unknown) => void
+  fundingSource?: string
 }
 
 type PayPalButtonsInstance = {
@@ -34,6 +35,10 @@ type PayPalButtonsInstance = {
 
 type PayPalNamespace = {
   Buttons: (options: PayPalButtonsOptions) => PayPalButtonsInstance
+  FUNDING: {
+    PAYPAL: string
+    CARD: string
+  }
 }
 
 declare global {

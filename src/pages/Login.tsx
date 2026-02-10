@@ -9,12 +9,13 @@ import { SectionHeader } from "@/components/SectionHeader"
 import { useApp } from "@/context/AppContext"
 
 export function Login() {
-  const { login, isAuthenticated, authLoading } = useApp()
+  const { login, resetPassword, isAuthenticated, authLoading } = useApp()
   const navigate = useNavigate()
   const location = useLocation()
   const [email, setEmail] = React.useState("")
   const [password, setPassword] = React.useState("")
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [isResetting, setIsResetting] = React.useState(false)
 
   React.useEffect(() => {
     if (!authLoading && isAuthenticated) {
@@ -41,6 +42,24 @@ export function Login() {
     }
   }
 
+  const handleReset = async () => {
+    if (!email) {
+      toast.error("Enter your email first.")
+      return
+    }
+    setIsResetting(true)
+    try {
+      await resetPassword(email)
+      toast.success("Password reset email sent.")
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Reset failed. Try again."
+      toast.error(message)
+    } finally {
+      setIsResetting(false)
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
       <Card className="w-full max-w-md border border-white/10 bg-white/5">
@@ -63,6 +82,15 @@ export function Login() {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
             />
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              onClick={handleReset}
+              disabled={isResetting}
+            >
+              {isResetting ? "Sending reset link..." : "Forgot password?"}
+            </Button>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? "Signing in..." : "Log In"}
             </Button>

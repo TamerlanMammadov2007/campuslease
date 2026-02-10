@@ -19,6 +19,7 @@ import { EditListing } from "@/pages/EditListing"
 import { Profile } from "@/pages/Profile"
 import { Login } from "@/pages/Login"
 import { Register } from "@/pages/Register"
+import { ResetPassword } from "@/pages/ResetPassword"
 import { AdminLogin } from "@/pages/AdminLogin"
 import { AdminDashboard } from "@/pages/AdminDashboard"
 import { RequireAdmin } from "@/components/auth/RequireAdmin"
@@ -31,6 +32,7 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route
           path="/admin"

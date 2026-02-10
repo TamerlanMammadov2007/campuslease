@@ -15,6 +15,7 @@ type AppState = {
   authLoading: boolean
   roommateProfile?: RoommateProfile
   login: (email: string, password: string) => Promise<void>
+  resetPassword: (email: string) => Promise<void>
   register: (
     name: string,
     email: string,
@@ -158,6 +159,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error
   }
 
+  const resetPassword = async (email: string) => {
+    const redirectTo = `${window.location.origin}/reset-password`
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo,
+    })
+    if (error) throw error
+  }
+
   const register = async (name: string, email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -274,6 +283,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     authLoading,
     roommateProfile,
     login,
+    resetPassword,
     register,
     logout,
     toggleFavorite,

@@ -1,4 +1,5 @@
 import React from "react"
+import { Autocomplete, useLoadScript } from "@react-google-maps/api"
 import { MapPin, Plus, UploadCloud, X } from "lucide-react"
 import { toast } from "sonner"
 
@@ -16,6 +17,7 @@ type ListingFormProps = {
   submitLabel: string
   submitDisabled?: boolean
   submitHint?: string
+  beforeSubmit?: React.ReactNode
 }
 
 const amenitySuggestions = [
@@ -43,11 +45,28 @@ export function ListingForm({
   submitLabel,
   submitDisabled = false,
   submitHint,
+  beforeSubmit,
 }: ListingFormProps) {
   const [draft, setDraft] = React.useState<Property>(initial)
   const [amenityInput, setAmenityInput] = React.useState("")
   const [imageInput, setImageInput] = React.useState("")
   const [isUploading, setIsUploading] = React.useState(false)
+  const [autocomplete, setAutocomplete] = React.useState<any>(null)
+  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined
+  const { isLoaded: isMapsReady } = useLoadScript({
+    googleMapsApiKey: googleMapsApiKey ?? "",
+    libraries: ["places"],
+  })
+
+  const extractCity = (components?: Array<{ long_name?: string; types?: string[] }>) => {
+    if (!components?.length) return ""
+    const priority = ["locality", "postal_town", "administrative_area_level_2"]
+    for (const type of priority) {
+      const match = components.find((item) => item.types?.includes(type))
+      if (match?.long_name) return match.long_name
+    }
+    return ""
+  }
 
   const addAmenity = (value?: string) => {
     const next = (value ?? amenityInput).trim()
@@ -117,6 +136,28 @@ export function ListingForm({
     setDraft((prev) => ({
       ...prev,
       images: prev.images.filter((item) => item !== url),
+    }))
+  }
+
+  const handlePlaceChanged = () => {
+    const place = autocomplete?.getPlace?.()
+    if (!place) return
+    const location = place.geometry?.location
+    if (!location) {
+      toast.error("Select a suggested address to auto-fill coordinates.")
+      return
+    }
+    const lat = location.lat()
+    const lng = location.lng()
+    const city = extractCity(place.address_components)
+    setDraft((prev) => ({
+      ...prev,
+      address: place.formatted_address ?? prev.address,
+      city: city || prev.city,
+      coordinates: {
+        lat,
+        lng,
+      },
     }))
   }
 
@@ -190,13 +231,33 @@ export function ListingForm({
           <div className="grid gap-4 md:grid-cols-2">
             <div className="md:col-span-2">
               <label className="text-xs text-slate-300">Street address</label>
-              <Input
-                placeholder="120 Crescent Ave"
-                value={draft.address}
-                onChange={(event) =>
-                  setDraft({ ...draft, address: event.target.value })
-                }
-              />
+              {googleMapsApiKey && isMapsReady ? (
+                <Autocomplete
+                  onLoad={setAutocomplete}
+                  onPlaceChanged={handlePlaceChanged}
+                >
+                  <Input
+                    placeholder="120 Crescent Ave"
+                    value={draft.address}
+                    onChange={(event) =>
+                      setDraft({ ...draft, address: event.target.value })
+                    }
+                  />
+                </Autocomplete>
+              ) : (
+                <Input
+                  placeholder="120 Crescent Ave"
+                  value={draft.address}
+                  onChange={(event) =>
+                    setDraft({ ...draft, address: event.target.value })
+                  }
+                />
+              )}
+              {googleMapsApiKey && !isMapsReady ? (
+                <p className="mt-2 text-xs text-slate-400">
+                  Loading address suggestions...
+                </p>
+              ) : null}
             </div>
             <div>
               <label className="text-xs text-slate-300">City</label>
@@ -492,6 +553,8 @@ export function ListingForm({
             </div>
           </div>
         </div>
+
+        {beforeSubmit}
 
         <div className="space-y-2">
           <Button onClick={() => onSubmit(draft)} disabled={submitDisabled}>

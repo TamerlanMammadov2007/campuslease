@@ -34,7 +34,7 @@ export function usePayPalScript(clientId: string | undefined, currency = "USD") 
     }
 
     const script = document.createElement("script")
-    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}&intent=capture`
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}&intent=capture&components=buttons&enable-funding=card`
     script.async = true
     script.dataset.paypalSdk = "true"
     script.onload = () => setState({ isReady: true })
