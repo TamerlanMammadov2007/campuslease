@@ -72,6 +72,11 @@ export function CreateListing() {
   )
 
   React.useEffect(() => {
+    payPalRenderedRef.current = { paypal: false, card: false }
+    setPaymentError(null)
+  }, [paymentMethod])
+
+  React.useEffect(() => {
     if (!isPayPalReady || paymentApproved) return
     if (!window.paypal) {
       setPaymentError("PayPal SDK not available.")

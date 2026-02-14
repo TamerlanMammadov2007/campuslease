@@ -52,11 +52,17 @@ export function ListingForm({
   const [imageInput, setImageInput] = React.useState("")
   const [isUploading, setIsUploading] = React.useState(false)
   const [autocomplete, setAutocomplete] = React.useState<any>(null)
+  const addressInputRef = React.useRef<HTMLInputElement | null>(null)
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined
+  const normalizedMapsKey =
+    googleMapsApiKey && googleMapsApiKey !== "your-google-maps-api-key"
+      ? googleMapsApiKey
+      : ""
   const { isLoaded: isMapsReady } = useLoadScript({
-    googleMapsApiKey: googleMapsApiKey ?? "",
+    googleMapsApiKey: normalizedMapsKey,
     libraries: ["places"],
   })
+  const canUseAutocomplete = Boolean(normalizedMapsKey) && isMapsReady
 
   const extractCity = (components?: Array<{ long_name?: string; types?: string[] }>) => {
     if (!components?.length) return ""
@@ -149,16 +155,21 @@ export function ListingForm({
     }
     const lat = location.lat()
     const lng = location.lng()
+    const formattedAddress =
+      place.formatted_address ?? addressInputRef.current?.value ?? draft.address
     const city = extractCity(place.address_components)
     setDraft((prev) => ({
       ...prev,
-      address: place.formatted_address ?? prev.address,
+      address: formattedAddress,
       city: city || prev.city,
       coordinates: {
         lat,
         lng,
       },
     }))
+    if (addressInputRef.current && formattedAddress) {
+      addressInputRef.current.value = formattedAddress
+    }
   }
 
   return (
@@ -231,14 +242,15 @@ export function ListingForm({
           <div className="grid gap-4 md:grid-cols-2">
             <div className="md:col-span-2">
               <label className="text-xs text-slate-300">Street address</label>
-              {googleMapsApiKey && isMapsReady ? (
+              {canUseAutocomplete ? (
                 <Autocomplete
                   onLoad={setAutocomplete}
                   onPlaceChanged={handlePlaceChanged}
                 >
                   <Input
                     placeholder="120 Crescent Ave"
-                    value={draft.address}
+                    defaultValue={draft.address}
+                    ref={addressInputRef}
                     onChange={(event) =>
                       setDraft({ ...draft, address: event.target.value })
                     }
@@ -253,7 +265,7 @@ export function ListingForm({
                   }
                 />
               )}
-              {googleMapsApiKey && !isMapsReady ? (
+              {normalizedMapsKey && !isMapsReady ? (
                 <p className="mt-2 text-xs text-slate-400">
                   Loading address suggestions...
                 </p>
