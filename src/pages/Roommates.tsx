@@ -44,25 +44,25 @@ const defaultFilters: RoommateFiltersState = {
 
 const defaultProfile: RoommateProfile = {
   id: "current-user",
-  name: "Jordan Parker",
-  age: 21,
-  gender: "Non-binary",
-  university: "UT Austin",
-  major: "Business",
+  name: "",
+  age: 0,
+  gender: "",
+  university: "",
+  major: "",
   bio: "",
-  budgetMin: 900,
-  budgetMax: 1500,
-  moveInDate: "2025-01-05",
+  budgetMin: 0,
+  budgetMax: 0,
+  moveInDate: "",
   preferredLocations: [],
-  sleepSchedule: "Flexible",
-  cleanliness: "Moderately Clean",
-  noise: "Moderate",
-  guests: "Sometimes",
-  smoking: "No",
-  drinking: "Sometimes",
-  pets: "Open to Pets",
-  studyHabits: "Balanced",
-  socialLevel: "Social",
+  sleepSchedule: "",
+  cleanliness: "",
+  noise: "",
+  guests: "",
+  smoking: "",
+  drinking: "",
+  pets: "",
+  studyHabits: "",
+  socialLevel: "",
   interests: [],
 }
 
@@ -144,8 +144,8 @@ export function Roommates() {
           subtitle="Tell us about your lifestyle and housing preferences to unlock AI-powered matches."
         />
         <Card className="border border-white/10 bg-white/10">
-          <CardContent className="space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-4">
+          <CardContent className="space-y-6 pt-1">
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
               <div className="flex items-center gap-3 text-white">
                 <Sparkles size={18} />
                 Complete your profile to get started.
@@ -163,9 +163,9 @@ export function Roommates() {
                 />
                 <Input
                   placeholder="Age"
-                  value={draft.age}
+                  value={draft.age || ""}
                   onChange={(event) =>
-                    setDraft({ ...draft, age: Number(event.target.value) })
+                    setDraft({ ...draft, age: Number(event.target.value) || 0 })
                   }
                 />
                 <Input
@@ -205,21 +205,21 @@ export function Roommates() {
                 <div className="grid gap-3 md:grid-cols-2">
                   <Input
                     placeholder="Budget min"
-                    value={draft.budgetMin}
+                    value={draft.budgetMin || ""}
                     onChange={(event) =>
                       setDraft({
                         ...draft,
-                        budgetMin: Number(event.target.value),
+                        budgetMin: Number(event.target.value) || 0,
                       })
                     }
                   />
                   <Input
                     placeholder="Budget max"
-                    value={draft.budgetMax}
+                    value={draft.budgetMax || ""}
                     onChange={(event) =>
                       setDraft({
                         ...draft,
-                        budgetMax: Number(event.target.value),
+                        budgetMax: Number(event.target.value) || 0,
                       })
                     }
                   />
@@ -265,6 +265,7 @@ export function Roommates() {
                   })
                 }
               >
+                <option value="">Sleep schedule</option>
                 <option value="Early Bird">Early Bird</option>
                 <option value="Night Owl">Night Owl</option>
                 <option value="Flexible">Flexible</option>
@@ -279,6 +280,7 @@ export function Roommates() {
                   })
                 }
               >
+                <option value="">Cleanliness</option>
                 <option value="Very Clean">Very Clean</option>
                 <option value="Moderately Clean">Moderately Clean</option>
                 <option value="Relaxed">Relaxed</option>
@@ -293,6 +295,7 @@ export function Roommates() {
                   })
                 }
               >
+                <option value="">Noise level</option>
                 <option value="Quiet">Quiet</option>
                 <option value="Moderate">Moderate</option>
                 <option value="Lively">Lively</option>
@@ -307,6 +310,7 @@ export function Roommates() {
                   })
                 }
               >
+                <option value="">Guests</option>
                 <option value="Rarely">Rarely</option>
                 <option value="Sometimes">Sometimes</option>
                 <option value="Often">Often</option>
@@ -321,6 +325,7 @@ export function Roommates() {
                   })
                 }
               >
+                <option value="">Drinking</option>
                 <option value="No">No drinking</option>
                 <option value="Sometimes">Social drinker</option>
                 <option value="Yes">Regular drinker</option>
@@ -335,6 +340,7 @@ export function Roommates() {
                   })
                 }
               >
+                <option value="">Smoking</option>
                 <option value="No">Non-smoker</option>
                 <option value="Yes">Smokes</option>
               </select>
@@ -348,6 +354,7 @@ export function Roommates() {
                   })
                 }
               >
+                <option value="">Pets</option>
                 <option value="No Pets">No Pets</option>
                 <option value="Has Pets">Has Pets</option>
                 <option value="Open to Pets">Open to Pets</option>
@@ -363,6 +370,7 @@ export function Roommates() {
                   })
                 }
               >
+                <option value="">Study habits</option>
                 <option value="Focused">Focused</option>
                 <option value="Balanced">Balanced</option>
                 <option value="Flexible">Flexible</option>
@@ -378,6 +386,7 @@ export function Roommates() {
                   })
                 }
               >
+                <option value="">Social level</option>
                 <option value="Low-key">Low-key</option>
                 <option value="Social">Social</option>
                 <option value="Very Social">Very Social</option>

@@ -174,12 +174,12 @@ export function ListingForm({
 
   return (
     <Card className="border border-white/10 bg-white/10">
-      <CardContent className="space-y-8">
-        <div className="space-y-2">
+      <CardContent className="space-y-8 pt-1">
+        <div className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-[0.35em] text-orange-200">
             Listing Basics
           </p>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2 pt-1">
             <div>
               <label className="text-xs text-slate-300">Listing title</label>
               <Input
@@ -324,7 +324,7 @@ export function ListingForm({
           <p className="text-xs font-semibold uppercase tracking-[0.35em] text-orange-200">
             Property Specs
           </p>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
             <div>
               <label className="text-xs text-slate-300">Bedrooms</label>
               <Input

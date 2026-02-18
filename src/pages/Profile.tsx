@@ -157,7 +157,7 @@ export function Profile() {
         subtitle="Update your contact details and housing preferences."
       />
       <Card className="border border-white/10 bg-white/10">
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-1">
           <div className="grid gap-4 md:grid-cols-2">
             <Input value={currentUserName} readOnly />
             <Input value={currentUserEmail} readOnly />

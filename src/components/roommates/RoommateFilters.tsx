@@ -32,7 +32,7 @@ export function RoommateFilters({ value, onChange }: RoommateFiltersProps) {
 
   return (
     <Card className="border border-white/10 bg-white/5">
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5 pt-1">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-semibold text-white">
             <Filter size={16} />

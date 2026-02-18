@@ -71,7 +71,7 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
 
   return (
     <Card className="border border-white/10 bg-white/5">
-      <CardContent className="space-y-5">
+      <CardContent className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-white">
             <Filter size={16} />
@@ -103,7 +103,7 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
           </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-4">
+        <div className="grid gap-4 lg:grid-cols-5 pt-1">
           <div className="lg:col-span-2">
             <Input
               placeholder="Search by city or address"
