@@ -30,6 +30,7 @@ export type Property = {
     lng: number
   }
   description: string
+  nearbyUniversity?: string
   createdDate: string
 }
 

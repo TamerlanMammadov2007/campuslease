@@ -7,6 +7,7 @@ import {
   BedDouble,
   Bath,
   DollarSign,
+  GraduationCap,
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils"
 
 export type PropertyFiltersState = {
   query: string
+  university: string
   type: string
   bedrooms: string
   bathrooms: string
@@ -60,6 +62,7 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
   const activeFilters =
     [
       value.query,
+      value.university,
       value.type,
       value.bedrooms,
       value.bathrooms,
@@ -85,6 +88,7 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
               onClick={() =>
                 onChange({
                   query: "",
+                  university: "",
                   type: "",
                   bedrooms: "",
                   bathrooms: "",
@@ -103,13 +107,24 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
           </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-5 pt-1">
+        <div className="grid gap-4 lg:grid-cols-6 pt-1">
           <div className="lg:col-span-2">
             <Input
               placeholder="Search by city or address"
               value={value.query}
               onChange={(event) =>
                 onChange({ ...value, query: event.target.value })
+              }
+            />
+          </div>
+          <div className="relative">
+            <GraduationCap size={14} className="absolute left-3 top-3 text-slate-400" />
+            <Input
+              className="pl-9"
+              placeholder="Nearby university"
+              value={value.university}
+              onChange={(event) =>
+                onChange({ ...value, university: event.target.value })
               }
             />
           </div>

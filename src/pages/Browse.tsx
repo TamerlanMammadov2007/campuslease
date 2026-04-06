@@ -11,6 +11,7 @@ import { useProperties } from "@/hooks/useProperties"
 
 const defaultFilters: PropertyFiltersState = {
   query: "",
+  university: "",
   type: "",
   bedrooms: "",
   bathrooms: "",
@@ -32,6 +33,14 @@ export function Browse() {
       !`${property.address} ${property.city}`
         .toLowerCase()
         .includes(filters.query.toLowerCase())
+    ) {
+      return false
+    }
+    if (
+      filters.university &&
+      !(property.nearbyUniversity ?? "")
+        .toLowerCase()
+        .includes(filters.university.toLowerCase())
     ) {
       return false
     }

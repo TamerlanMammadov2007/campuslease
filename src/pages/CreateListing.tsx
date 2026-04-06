@@ -42,6 +42,7 @@ const createEmptyListing = (name: string, email: string, ownerId: string): Prope
     lng: -97.7361,
   },
   description: "",
+  nearbyUniversity: "",
   createdDate: new Date().toISOString(),
 })
 

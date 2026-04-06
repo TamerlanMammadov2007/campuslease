@@ -46,6 +46,7 @@ create table if not exists public.listings (
   status text not null,
   coordinates jsonb,
   description text,
+  nearby_university text,
   created_at timestamptz default now()
 );
 

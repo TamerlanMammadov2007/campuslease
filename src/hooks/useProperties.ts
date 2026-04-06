@@ -28,6 +28,7 @@ type ListingRow = {
   status: Property["status"]
   coordinates?: { lat: number; lng: number } | null
   description?: string | null
+  nearby_university?: string | null
   created_at: string
 }
 
@@ -58,6 +59,7 @@ const mapListing = (row: ListingRow): Property => ({
   status: row.status,
   coordinates: row.coordinates ?? { lat: 0, lng: 0 },
   description: row.description ?? "",
+  nearbyUniversity: row.nearby_university ?? undefined,
   createdDate: row.created_at,
 })
 
@@ -85,6 +87,7 @@ const toListingPayload = (property: Property, ownerId: string, ownerName: string
   status: property.status,
   coordinates: property.coordinates,
   description: property.description,
+  nearby_university: property.nearbyUniversity ?? null,
 })
 
 export function useProperties() {

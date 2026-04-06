@@ -279,6 +279,16 @@ export function ListingForm({
                 onChange={(event) => setDraft({ ...draft, city: event.target.value })}
               />
             </div>
+            <div>
+              <label className="text-xs text-slate-300">Nearby university</label>
+              <Input
+                placeholder="University of Texas at Austin"
+                value={draft.nearbyUniversity ?? ""}
+                onChange={(event) =>
+                  setDraft({ ...draft, nearbyUniversity: event.target.value })
+                }
+              />
+            </div>
             <div className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-xs text-slate-300">
               <div className="flex items-center gap-2">
                 <MapPin size={14} className="text-orange-200" />
