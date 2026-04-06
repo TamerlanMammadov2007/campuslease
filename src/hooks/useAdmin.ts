@@ -110,7 +110,7 @@ export function useAdminApplications() {
       return (data ?? []).map((row) => ({
         id: row.id,
         listing_id: row.listing_id,
-        listing_title: row.listings?.title,
+        listing_title: Array.isArray(row.listings) ? row.listings[0]?.title : (row.listings as any)?.title,
         name: row.applicant_name,
         email: row.applicant_email,
         phone: row.applicant_phone ?? undefined,

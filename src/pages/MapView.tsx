@@ -10,6 +10,7 @@ import { useProperties } from "@/hooks/useProperties"
 
 const defaultFilters: PropertyFiltersState = {
   query: "",
+  university: "",
   type: "",
   bedrooms: "",
   bathrooms: "",
