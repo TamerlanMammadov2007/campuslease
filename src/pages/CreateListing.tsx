@@ -2,6 +2,7 @@ import React from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { SectionHeader } from "@/components/SectionHeader"
 import { ListingForm } from "@/components/listings/ListingForm"
 import { useApp } from "@/context/AppContext"
@@ -161,6 +162,7 @@ export function CreateListing() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "Create Listing" }]} />
       <div className="rounded-3xl bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 p-6 text-white">
         <SectionHeader
           eyebrow="Create Listing"

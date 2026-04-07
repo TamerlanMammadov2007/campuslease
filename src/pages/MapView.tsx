@@ -2,6 +2,7 @@ import React from "react"
 import { GoogleMap, InfoWindow, Marker, useLoadScript } from "@react-google-maps/api"
 import { Link } from "react-router-dom"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { PropertyFilters } from "@/components/properties/PropertyFilters"
 import type { PropertyFiltersState } from "@/components/properties/PropertyFilters"
 import { Card, CardContent } from "@/components/ui/card"
@@ -85,6 +86,7 @@ export function MapView() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "Map View" }]} />
       <PropertyFilters value={filters} onChange={setFilters} />
       <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
         <div className="h-[520px] overflow-hidden rounded-3xl border border-white/10">

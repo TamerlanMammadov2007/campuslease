@@ -2,6 +2,7 @@ import React from "react"
 import { motion } from "framer-motion"
 import { Search } from "lucide-react"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { SectionHeader } from "@/components/SectionHeader"
 import { CompareBar } from "@/components/properties/CompareBar"
 import { PropertyFilters } from "@/components/properties/PropertyFilters"
@@ -65,6 +66,7 @@ export function Browse() {
 
   return (
     <div className="space-y-8">
+      <Breadcrumb items={[{ label: "Browse" }]} />
       <div className="rounded-3xl bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 p-8 text-white shadow-xl">
         <SectionHeader
           eyebrow="Student Housing"

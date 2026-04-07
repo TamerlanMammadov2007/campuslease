@@ -1,6 +1,7 @@
 import React from "react"
 import { toast } from "sonner"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { SectionHeader } from "@/components/SectionHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -151,6 +152,7 @@ export function Profile() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "Profile" }]} />
       <SectionHeader
         eyebrow="Profile"
         title="Manage Your Profile"

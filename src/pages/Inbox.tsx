@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { Building2, MessageSquare } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { SectionHeader } from "@/components/SectionHeader"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -59,6 +60,7 @@ export function Inbox() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "Inbox" }]} />
       <SectionHeader
         eyebrow="Inbox"
         title="Messages"

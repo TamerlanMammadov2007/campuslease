@@ -1,6 +1,7 @@
 import { Heart } from "lucide-react"
 import { Link } from "react-router-dom"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { SectionHeader } from "@/components/SectionHeader"
 import { Card, CardContent } from "@/components/ui/card"
 import { PropertyCard } from "@/components/properties/PropertyCard"
@@ -31,6 +32,7 @@ export function Favorites() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "Favorites" }]} />
       <SectionHeader
         eyebrow="Favorites"
         title="Saved Listings"

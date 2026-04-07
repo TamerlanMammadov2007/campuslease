@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import { toast } from "sonner"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { SectionHeader } from "@/components/SectionHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -18,6 +19,7 @@ export function MyListings() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "My Listings" }]} />
       <SectionHeader
         eyebrow="My Listings"
         title="Manage Your Properties"

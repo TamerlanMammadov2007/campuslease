@@ -2,6 +2,7 @@ import React from "react"
 import { motion } from "framer-motion"
 import { Camera, Sparkles } from "lucide-react"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { SectionHeader } from "@/components/SectionHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -421,6 +422,7 @@ export function Roommates() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "Roommates" }]} />
       <SectionHeader
         eyebrow="Roommate Matching"
         title="AI-Powered Compatibility Matches"

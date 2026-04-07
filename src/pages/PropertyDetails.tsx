@@ -4,6 +4,7 @@ import { Calendar, CheckCircle2, Mail, Phone } from "lucide-react"
 import { format } from "date-fns"
 import { motion } from "framer-motion"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useProperty, useProperties } from "@/hooks/useProperties"
@@ -82,6 +83,7 @@ export function PropertyDetails() {
 
   return (
     <div className="space-y-8">
+      <Breadcrumb items={[{ label: "Browse", href: "/browse" }, { label: property.title }]} />
       <SectionHeader
         eyebrow="Property Details"
         title={property.title}

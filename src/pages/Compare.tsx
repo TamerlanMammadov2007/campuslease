@@ -1,6 +1,7 @@
 import { useMemo, type ReactNode } from "react"
 import { Link } from "react-router-dom"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { SectionHeader } from "@/components/SectionHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -44,6 +45,7 @@ export function Compare() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "Compare" }]} />
       <SectionHeader
         eyebrow="Compare"
         title="Side-by-Side Comparison"
