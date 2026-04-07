@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/login
+Disallow: /inbox
+Disallow: /profile
+Disallow: /create
+Disallow: /listings
+
+Sitemap: https://campus-leases.com/sitemap.xml
