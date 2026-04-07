@@ -9,6 +9,7 @@ import { PropertyFilters } from "@/components/properties/PropertyFilters"
 import type { PropertyFiltersState } from "@/components/properties/PropertyFilters"
 import { PropertyCard } from "@/components/properties/PropertyCard"
 import { useProperties } from "@/hooks/useProperties"
+import { PropertyGridSkeleton } from "@/components/skeletons/PropertyCardSkeleton"
 
 const defaultFilters: PropertyFiltersState = {
   query: "",
@@ -25,7 +26,7 @@ const defaultFilters: PropertyFiltersState = {
 }
 
 export function Browse() {
-  const { data: properties = [] } = useProperties()
+  const { data: properties = [], isLoading } = useProperties()
   const [filters, setFilters] = React.useState(defaultFilters)
 
   const filtered = properties.filter((property) => {
@@ -81,11 +82,12 @@ export function Browse() {
 
       <PropertyFilters value={filters} onChange={setFilters} />
 
+      {isLoading ? <PropertyGridSkeleton /> : null}
       <motion.div
         layout
         className="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
       >
-        {filtered.map((property) => (
+        {!isLoading && filtered.map((property) => (
           <motion.div
             key={property.id}
             layout

@@ -12,6 +12,7 @@ import { RoommateFilters } from "@/components/roommates/RoommateFilters"
 import type { RoommateFiltersState } from "@/components/roommates/RoommateFilters"
 import { RoommateCard } from "@/components/roommates/RoommateCard"
 import { useRoommates } from "@/hooks/useRoommates"
+import { RoommateGridSkeleton } from "@/components/skeletons/RoommateCardSkeleton"
 import type { RoommateProfile } from "@/data/types"
 import { useApp } from "@/context/AppContext"
 import { toast } from "sonner"
@@ -73,7 +74,7 @@ export function Roommates() {
     roommateProfile ?? defaultProfile,
   )
   const [filters, setFilters] = React.useState(defaultFilters)
-  const { data: profiles = [] } = useRoommates()
+  const { data: profiles = [], isLoading: profilesLoading } = useRoommates()
   const [locationInput, setLocationInput] = React.useState("")
 
   React.useEffect(() => {
@@ -429,11 +430,12 @@ export function Roommates() {
         subtitle="Filter the best roommates for your lifestyle, budget, and campus."
       />
       <RoommateFilters value={filters} onChange={setFilters} />
+      {profilesLoading ? <RoommateGridSkeleton /> : null}
       <motion.div
         layout
         className="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
       >
-        {filtered.map((profile) => (
+        {!profilesLoading && filtered.map((profile) => (
           <motion.div
             key={profile.id}
             layout

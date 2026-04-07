@@ -2,6 +2,7 @@ import { Link } from "react-router-dom"
 import { toast } from "sonner"
 
 import { Breadcrumb } from "@/components/Breadcrumb"
+import { PropertyGridSkeleton } from "@/components/skeletons/PropertyCardSkeleton"
 import { SectionHeader } from "@/components/SectionHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -26,9 +27,7 @@ export function MyListings() {
         subtitle="Edit, update, and track your active listings."
       />
       {isLoading ? (
-        <Card>
-          <CardContent className="text-slate-200">Loading listings...</CardContent>
-        </Card>
+        <PropertyGridSkeleton count={3} />
       ) : ownedListings.length === 0 ? (
         <Card>
           <CardContent className="text-slate-200">

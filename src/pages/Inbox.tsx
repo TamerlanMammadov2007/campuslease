@@ -4,6 +4,7 @@ import { Building2, MessageSquare } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 
 import { Breadcrumb } from "@/components/Breadcrumb"
+import { InboxSkeleton } from "@/components/skeletons/InboxSkeleton"
 import { SectionHeader } from "@/components/SectionHeader"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -34,14 +35,7 @@ export function Inbox() {
   }, [currentUserId, queryClient])
 
   if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="flex flex-col items-center gap-3 py-12 text-center text-slate-200">
-          <MessageSquare size={32} />
-          <p>Loading conversations...</p>
-        </CardContent>
-      </Card>
-    )
+    return <InboxSkeleton />
   }
 
   if (threads.length === 0) {
