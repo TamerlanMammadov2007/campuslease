@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom"
 import { toast } from "sonner"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { SectionHeader } from "@/components/SectionHeader"
 import { ListingForm } from "@/components/listings/ListingForm"
 import { Card, CardContent } from "@/components/ui/card"
@@ -42,6 +43,7 @@ export function EditListing() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "My Listings", href: "/listings" }, { label: "Edit Listing" }]} />
       <SectionHeader
         eyebrow="Edit Listing"
         title={`Update ${listing.title}`}

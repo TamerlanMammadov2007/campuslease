@@ -23,6 +23,7 @@ import { ResetPassword } from "@/pages/ResetPassword"
 import { AdminLogin } from "@/pages/AdminLogin"
 import { AdminDashboard } from "@/pages/AdminDashboard"
 import { RequireAdmin } from "@/components/auth/RequireAdmin"
+import { NotFound } from "@/pages/NotFound"
 
 function App() {
   return (
@@ -160,6 +161,14 @@ function App() {
                 <Profile />
               </Layout>
             </RequireAuth>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <Layout>
+              <NotFound />
+            </Layout>
           }
         />
       </Routes>

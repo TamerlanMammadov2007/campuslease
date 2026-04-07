@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom"
 import { toast } from "sonner"
 
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { SectionHeader } from "@/components/SectionHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -52,6 +53,7 @@ export function RoommateProfileView() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "Roommates", href: "/roommates" }, { label: profile.name }]} />
       <SectionHeader
         eyebrow="Roommate Profile"
         title={profile.name}
