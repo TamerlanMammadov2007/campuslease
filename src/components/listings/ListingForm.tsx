@@ -1,6 +1,6 @@
 import React from "react"
 import { Autocomplete, useLoadScript } from "@react-google-maps/api"
-import { MapPin, Plus, UploadCloud, X } from "lucide-react"
+import { Plus, UploadCloud, X } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -197,7 +197,8 @@ export function ListingForm({
                 min={0}
                 step={50}
                 placeholder="1650"
-                value={draft.price}
+                value={draft.price === 0 ? "" : draft.price}
+                onFocus={(event) => event.target.select()}
                 onChange={(event) =>
                   setDraft({ ...draft, price: Number(event.target.value) })
                 }
@@ -289,44 +290,6 @@ export function ListingForm({
                 }
               />
             </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-xs text-slate-300">
-              <div className="flex items-center gap-2">
-                <MapPin size={14} className="text-orange-200" />
-                Map view uses coordinates.
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <Input
-                  type="number"
-                  step="0.0001"
-                  placeholder="Latitude"
-                  value={draft.coordinates.lat}
-                  onChange={(event) =>
-                    setDraft({
-                      ...draft,
-                      coordinates: {
-                        ...draft.coordinates,
-                        lat: Number(event.target.value),
-                      },
-                    })
-                  }
-                />
-                <Input
-                  type="number"
-                  step="0.0001"
-                  placeholder="Longitude"
-                  value={draft.coordinates.lng}
-                  onChange={(event) =>
-                    setDraft({
-                      ...draft,
-                      coordinates: {
-                        ...draft.coordinates,
-                        lng: Number(event.target.value),
-                      },
-                    })
-                  }
-                />
-              </div>
-            </div>
           </div>
         </div>
 
@@ -340,7 +303,8 @@ export function ListingForm({
               <Input
                 type="number"
                 min={0}
-                value={draft.bedrooms}
+                value={draft.bedrooms === 0 ? "" : draft.bedrooms}
+                onFocus={(event) => event.target.select()}
                 onChange={(event) =>
                   setDraft({ ...draft, bedrooms: Number(event.target.value) })
                 }
@@ -351,7 +315,8 @@ export function ListingForm({
               <Input
                 type="number"
                 min={0}
-                value={draft.bathrooms}
+                value={draft.bathrooms === 0 ? "" : draft.bathrooms}
+                onFocus={(event) => event.target.select()}
                 onChange={(event) =>
                   setDraft({ ...draft, bathrooms: Number(event.target.value) })
                 }
@@ -362,7 +327,8 @@ export function ListingForm({
               <Input
                 type="number"
                 min={0}
-                value={draft.squareFeet}
+                value={draft.squareFeet === 0 ? "" : draft.squareFeet}
+                onFocus={(event) => event.target.select()}
                 onChange={(event) =>
                   setDraft({ ...draft, squareFeet: Number(event.target.value) })
                 }

@@ -8,7 +8,6 @@ import {
   MessageSquare,
   PlusCircle,
   UserCircle,
-  Users,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -17,8 +16,7 @@ import { useApp } from "@/context/AppContext"
 const navItems = [
   { to: "/browse", label: "Browse Properties", icon: Home },
   { to: "/map", label: "Map View", icon: MapPin },
-  { to: "/roommates", label: "Find Roommates", icon: Users },
-  { to: "/inbox", label: "Inbox", icon: MessageSquare },
+{ to: "/inbox", label: "Inbox", icon: MessageSquare },
   { to: "/favorites", label: "My Favorites", icon: Heart },
   { to: "/create", label: "List Your Property", icon: PlusCircle },
   { to: "/listings", label: "My Listings", icon: Building2 },

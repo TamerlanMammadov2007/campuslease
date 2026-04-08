@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { Building2, ShieldCheck, Sparkles, Users } from "lucide-react"
+import { Building2, ShieldCheck, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
@@ -11,12 +11,6 @@ const benefits = [
     title: "Curated Listings",
     description:
       "Browse polished student-ready homes with transparent pricing and verified details.",
-  },
-  {
-    icon: Users,
-    title: "Roommate Matching",
-    description:
-      "AI compatibility scoring finds people who align with your lifestyle.",
   },
   {
     icon: ShieldCheck,
@@ -46,15 +40,11 @@ export function Landing() {
             </h1>
             <p className="text-base text-slate-300 md:text-lg">
               A luxurious housing marketplace built for campus life. Explore
-              listings, connect with roommates, and manage messages in one
-              unified experience.
+              listings and manage messages in one unified experience.
             </p>
             <div className="flex flex-wrap gap-4">
               <Button asChild size="lg">
-              <Link to="/login">Log In to Browse</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link to="/roommates">Find Roommates</Link>
+                <Link to="/login">Log In to Browse</Link>
               </Button>
             </div>
           </div>

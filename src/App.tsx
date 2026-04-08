@@ -8,8 +8,6 @@ import { Browse } from "@/pages/Browse"
 import { MapView } from "@/pages/MapView"
 import { PropertyDetails } from "@/pages/PropertyDetails"
 import { Compare } from "@/pages/Compare"
-import { Roommates } from "@/pages/Roommates"
-import { RoommateProfileView } from "@/pages/RoommateProfileView"
 import { Inbox } from "@/pages/Inbox"
 import { Conversation } from "@/pages/Conversation"
 import { Favorites } from "@/pages/Favorites"
@@ -74,22 +72,6 @@ function App() {
           element={
             <Layout>
               <Compare />
-            </Layout>
-          }
-        />
-        <Route
-          path="/roommates"
-          element={
-            <Layout>
-              <Roommates />
-            </Layout>
-          }
-        />
-        <Route
-          path="/roommates/:id"
-          element={
-            <Layout>
-              <RoommateProfileView />
             </Layout>
           }
         />
