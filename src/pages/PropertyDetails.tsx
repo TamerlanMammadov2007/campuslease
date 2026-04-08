@@ -7,6 +7,7 @@ import { motion } from "framer-motion"
 import { Breadcrumb } from "@/components/Breadcrumb"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { PropertyDetailSkeleton } from "@/components/skeletons/DetailSkeleton"
 import { useProperty, useProperties } from "@/hooks/useProperties"
 import { useApp } from "@/context/AppContext"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -29,11 +30,7 @@ export function PropertyDetails() {
   const [message, setMessage] = React.useState("")
 
   if (!property) {
-    return (
-      <Card>
-        <CardContent className="text-white">Loading property...</CardContent>
-      </Card>
-    )
+    return <PropertyDetailSkeleton />
   }
 
   const similar = properties

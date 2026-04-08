@@ -5,6 +5,7 @@ import { Breadcrumb } from "@/components/Breadcrumb"
 import { SectionHeader } from "@/components/SectionHeader"
 import { ListingForm } from "@/components/listings/ListingForm"
 import { Card, CardContent } from "@/components/ui/card"
+import { EditListingSkeleton } from "@/components/skeletons/DetailSkeleton"
 import { useProperty, useUpdateListing } from "@/hooks/useProperties"
 import { useApp } from "@/context/AppContext"
 
@@ -16,11 +17,7 @@ export function EditListing() {
   const navigate = useNavigate()
 
   if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="text-white">Loading listing...</CardContent>
-      </Card>
-    )
+    return <EditListingSkeleton />
   }
 
   if (!listing) {
