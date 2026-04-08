@@ -481,7 +481,7 @@ export function MapView() {
           <MapComponent height="h-full" />
         </div>
 
-        {filtered.length > 0 && <div className="hidden w-80 flex-shrink-0 overflow-y-auto border-l border-white/10 bg-slate-950 p-4 lg:block">
+        <div className="hidden w-80 flex-shrink-0 overflow-y-auto border-l border-white/10 bg-slate-950 p-4 lg:block">
           <div className="space-y-3">
             {filtered.map((property) => (
               <button
@@ -515,7 +515,13 @@ export function MapView() {
               </button>
             ))}
           </div>
-        </div>}
+          {filtered.length === 0 && (
+            <div className="flex h-full flex-col items-center justify-center text-center text-slate-400">
+              <p className="text-sm font-semibold text-white">No listings available</p>
+              <p className="mt-1 text-xs">Try adjusting your filters.</p>
+            </div>
+          )}
+        </div>
       </div>
     )
   }
