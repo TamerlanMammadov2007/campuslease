@@ -37,8 +37,11 @@ export function AdminLogin() {
         .eq("id", user.id)
         .maybeSingle()
       if (!profile?.is_admin) {
-        await supabase.auth.signOut()
-        throw new Error("Admin access required.")
+        try {
+          await supabase.auth.signOut()
+        } finally {
+          throw new Error("Admin access required.")
+        }
       }
       await supabase.from("admin_login_events").insert({
         user_id: user.id,
@@ -47,9 +50,6 @@ export function AdminLogin() {
       })
       toast.success("Admin access granted.")
       navigate("/admin", { replace: true })
-      setTimeout(() => {
-        window.location.href = "/admin"
-      }, 50)
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Admin login failed."

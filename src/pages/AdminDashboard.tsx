@@ -105,6 +105,18 @@ export function AdminDashboard() {
 
   const handleSaveListing = async () => {
     if (!editingListingId) return
+    if (!listingDraft.title.trim()) {
+      toast.error("Title cannot be empty.")
+      return
+    }
+    if (!listingDraft.city.trim()) {
+      toast.error("City cannot be empty.")
+      return
+    }
+    if (!listingDraft.price || listingDraft.price <= 0) {
+      toast.error("Price must be greater than 0.")
+      return
+    }
     try {
       await updateListing({
         id: editingListingId,

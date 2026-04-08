@@ -53,6 +53,7 @@ export function Profile() {
   const { currentUserEmail, currentUserName, currentUserId } = useApp()
   const [profile, setProfile] = React.useState<ProfileState>(defaultProfile)
   const [cityInput, setCityInput] = React.useState("")
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   React.useEffect(() => {
     setProfile((prev) => ({
@@ -119,35 +120,42 @@ export function Profile() {
   }
 
   const handleSave = async () => {
-    if (!currentUserId) return
-    const { error } = await supabase
-      .from("profiles")
-      .upsert(
-        {
-          id: currentUserId,
-          name: currentUserName,
-          email: currentUserEmail,
-          phone: profile.phone,
-          bio: profile.bio,
-          university: profile.university,
-          grad_year: profile.gradYear,
-          lease_duration: profile.leaseDuration,
-          move_in_date: profile.moveInDate || null,
-          property_types: profile.propertyTypes,
-          preferred_cities: profile.preferredCities,
-          parking: profile.parking,
-          budget_min: profile.budgetMin,
-          budget_max: profile.budgetMax,
-          has_pets: profile.hasPets,
-          pet_type: profile.petType,
-        },
-        { onConflict: "id" },
-      )
-    if (error) {
-      toast.error("Failed to update profile.")
+    if (!currentUserId) {
+      toast.error("You must be logged in to save your profile.")
       return
     }
-    toast.success("Profile updated successfully.")
+    setIsSubmitting(true)
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: currentUserId,
+            name: currentUserName,
+            email: currentUserEmail,
+            phone: profile.phone,
+            bio: profile.bio,
+            university: profile.university,
+            grad_year: profile.gradYear,
+            lease_duration: profile.leaseDuration,
+            move_in_date: profile.moveInDate || null,
+            property_types: profile.propertyTypes,
+            preferred_cities: profile.preferredCities,
+            parking: profile.parking,
+            budget_min: profile.budgetMin,
+            budget_max: profile.budgetMax,
+            has_pets: profile.hasPets,
+            pet_type: profile.petType,
+          },
+          { onConflict: "id" },
+        )
+      if (error) throw error
+      toast.success("Profile updated successfully.")
+    } catch {
+      toast.error("Failed to update profile.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -309,7 +317,9 @@ export function Profile() {
             ) : null}
           </div>
 
-          <Button onClick={handleSave}>Save Profile</Button>
+          <Button onClick={handleSave} disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save Profile"}
+          </Button>
         </CardContent>
       </Card>
     </div>

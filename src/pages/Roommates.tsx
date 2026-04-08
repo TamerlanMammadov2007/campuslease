@@ -76,6 +76,7 @@ export function Roommates() {
   const [filters, setFilters] = React.useState(defaultFilters)
   const { data: profiles = [], isLoading: profilesLoading } = useRoommates()
   const [locationInput, setLocationInput] = React.useState("")
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   React.useEffect(() => {
     setDraft(roommateProfile ?? defaultProfile)
@@ -129,11 +130,18 @@ export function Roommates() {
       toast.error("Please log in to save your roommate profile.")
       return
     }
+    if (draft.budgetMin > draft.budgetMax && draft.budgetMax > 0) {
+      toast.error("Minimum budget cannot exceed maximum budget.")
+      return
+    }
+    setIsSubmitting(true)
     try {
       await setRoommateProfile(draft)
       toast.success("Roommate profile saved.")
     } catch {
       toast.error("Failed to save roommate profile.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -152,7 +160,9 @@ export function Roommates() {
                 <Sparkles size={18} />
                 Complete your profile to get started.
               </div>
-              <Button onClick={handleSaveProfile}>Save Profile</Button>
+              <Button onClick={handleSaveProfile} disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : "Save Profile"}
+              </Button>
             </div>
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-4">

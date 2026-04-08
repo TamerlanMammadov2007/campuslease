@@ -13,7 +13,7 @@ import { supabase } from "@/lib/supabase"
 
 type ListingFormProps = {
   initial: Property
-  onSubmit: (property: Property) => void
+  onSubmit: (property: Property) => Promise<void> | void
   submitLabel: string
   submitDisabled?: boolean
   submitHint?: string
@@ -51,6 +51,7 @@ export function ListingForm({
   const [amenityInput, setAmenityInput] = React.useState("")
   const [imageInput, setImageInput] = React.useState("")
   const [isUploading, setIsUploading] = React.useState(false)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [autocomplete, setAutocomplete] = React.useState<any>(null)
   const addressInputRef = React.useRef<HTMLInputElement | null>(null)
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined
@@ -545,8 +546,26 @@ export function ListingForm({
         {beforeSubmit}
 
         <div className="space-y-2">
-          <Button onClick={() => onSubmit(draft)} disabled={submitDisabled}>
-            {submitLabel}
+          <Button
+            onClick={async () => {
+              if (!draft.title.trim()) {
+                toast.error("Please enter a listing title.")
+                return
+              }
+              if (!draft.price || draft.price <= 0) {
+                toast.error("Please enter a valid monthly rent.")
+                return
+              }
+              setIsSubmitting(true)
+              try {
+                await onSubmit(draft)
+              } finally {
+                setIsSubmitting(false)
+              }
+            }}
+            disabled={submitDisabled || isSubmitting || isUploading}
+          >
+            {isSubmitting ? "Saving..." : submitLabel}
           </Button>
           {submitHint ? (
             <p className="text-xs text-slate-300">{submitHint}</p>

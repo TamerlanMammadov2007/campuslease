@@ -54,7 +54,7 @@ export function RoommateCard({ profile }: RoommateCardProps) {
         <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300">
           <span className="flex items-center gap-1">
             <MapPin size={12} />
-            {profile.preferredLocations[0]}
+            {profile.preferredLocations[0] ?? "Anywhere"}
           </span>
           <span className="flex items-center gap-1">
             <Calendar size={12} />

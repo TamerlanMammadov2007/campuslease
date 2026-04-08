@@ -17,6 +17,7 @@ export function Conversation() {
   const { mutateAsync: sendMessage } = useSendMessage()
   const { mutateAsync: markThreadRead } = useMarkThreadRead()
   const [message, setMessage] = React.useState("")
+  const [isSending, setIsSending] = React.useState(false)
   const bottomRef = React.useRef<HTMLDivElement | null>(null)
   const queryClient = useQueryClient()
 
@@ -67,6 +68,7 @@ export function Conversation() {
 
   const handleSend = async () => {
     if (!message.trim()) return
+    setIsSending(true)
     try {
       await sendMessage({
         threadId: thread.id,
@@ -75,6 +77,8 @@ export function Conversation() {
       setMessage("")
     } catch {
       toast.error("Failed to send message.")
+    } finally {
+      setIsSending(false)
     }
   }
 
@@ -118,7 +122,9 @@ export function Conversation() {
               value={message}
               onChange={(event) => setMessage(event.target.value)}
             />
-            <Button onClick={handleSend}>Send Message</Button>
+            <Button onClick={handleSend} disabled={isSending}>
+              {isSending ? "Sending..." : "Send Message"}
+            </Button>
           </div>
         </CardContent>
       </Card>

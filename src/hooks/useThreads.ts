@@ -90,7 +90,16 @@ export function useCreateThread() {
       } else if (payload.participantId) {
         recipientId = payload.participantId
         recipientName = payload.participantName
-        recipientEmail = payload.participantEmail
+        if (payload.participantEmail) {
+          recipientEmail = payload.participantEmail
+        } else {
+          const { data: recipientProfile } = await supabase
+            .from("profiles")
+            .select("email")
+            .eq("id", payload.participantId)
+            .maybeSingle()
+          recipientEmail = recipientProfile?.email ?? ""
+        }
       } else {
         throw new Error("Missing recipient information.")
       }

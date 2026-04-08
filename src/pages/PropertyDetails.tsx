@@ -28,6 +28,7 @@ export function PropertyDetails() {
   const { mutateAsync: createApplication } = useCreateApplication()
   const [activeImage, setActiveImage] = React.useState(0)
   const [message, setMessage] = React.useState("")
+  const [isSending, setIsSending] = React.useState(false)
 
   if (!property) {
     return <PropertyDetailSkeleton />
@@ -46,6 +47,7 @@ export function PropertyDetails() {
       navigate("/login")
       return
     }
+    setIsSending(true)
     try {
       await createThread({
         propertyId: property.id,
@@ -68,6 +70,8 @@ export function PropertyDetails() {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to send message."
       toast.error(errorMessage)
+    } finally {
+      setIsSending(false)
     }
   }
 
@@ -214,7 +218,7 @@ export function PropertyDetails() {
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}
                 />
-                <Button className="w-full" onClick={handleSendMessage}>
+                <Button className="w-full" onClick={handleSendMessage} disabled={isSending}>
                   Send Message
                 </Button>
               </div>

@@ -207,6 +207,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const toggleCompare = (id: string) => {
     if (!currentUser) return
     const isCompared = compareIds.includes(id)
+    const willAdd = !isCompared && compareIds.length < 4
     setCompareIds((prev) => {
       if (isCompared) {
         return prev.filter((item) => item !== id)
@@ -222,7 +223,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         .delete()
         .eq("user_id", currentUser.id)
         .eq("listing_id", id)
-    } else if (compareIds.length < 4) {
+    } else if (willAdd) {
       void supabase.from("compare_items").insert({ user_id: currentUser.id, listing_id: id })
     }
   }
