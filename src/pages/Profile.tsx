@@ -280,22 +280,6 @@ export function Profile() {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <Input
-              placeholder="Minimum budget"
-              value={profile.budgetMin}
-              onChange={(event) =>
-                setProfile({ ...profile, budgetMin: Number(event.target.value) })
-              }
-            />
-            <Input
-              placeholder="Maximum budget"
-              value={profile.budgetMax}
-              onChange={(event) =>
-                setProfile({ ...profile, budgetMax: Number(event.target.value) })
-              }
-            />
-          </div>
 
           <div className="flex flex-wrap items-center gap-4">
             <label className="flex items-center gap-2 text-sm text-slate-200">
