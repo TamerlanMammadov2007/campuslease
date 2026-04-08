@@ -1,5 +1,5 @@
 import { Heart, MapPin, Square, BedDouble, Bath, CheckSquare } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -15,9 +15,18 @@ type PropertyCardProps = {
 
 export function PropertyCard({ property }: PropertyCardProps) {
   const { favorites, toggleFavorite, compareIds, toggleCompare, isAuthenticated } = useApp()
+  const navigate = useNavigate()
   const isFavorite = favorites.includes(property.id)
   const isCompared = compareIds.includes(property.id)
   const compareDisabled = !isCompared && compareIds.length >= 4
+
+  const requireAuth = (action: () => void) => {
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: `/properties/${property.id}` } })
+      return
+    }
+    action()
+  }
 
   return (
     <Card className="overflow-hidden">
@@ -39,14 +48,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
             "absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-slate-900/60 text-white transition",
             isFavorite && "bg-rose-500/90 text-white",
           )}
-          onClick={() => {
-            if (!isAuthenticated) {
-              toast.error("Please log in to save favorites.")
-              return
-            }
+          onClick={() => requireAuth(() => {
             toggleFavorite(property.id)
             toast(isFavorite ? "Removed from favorites." : "Saved to favorites.")
-          }}
+          })}
           aria-label="Toggle favorite"
         >
           <Heart size={18} fill={isFavorite ? "currentColor" : "none"} />
@@ -81,13 +86,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             <Link to={`/properties/${property.id}`}>View Details</Link>
           </Button>
         <button
-          onClick={() => {
-            if (!isAuthenticated) {
-              toast.error("Please log in to compare listings.")
-              return
-            }
-            toggleCompare(property.id)
-          }}
+          onClick={() => requireAuth(() => toggleCompare(property.id))}
           className={cn(
               "flex items-center gap-2 rounded-full border border-white/20 px-3 py-2 text-xs text-white transition",
               isCompared && "border-orange-300/80 bg-orange-400/20 text-orange-100",

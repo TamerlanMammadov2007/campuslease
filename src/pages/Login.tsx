@@ -31,7 +31,7 @@ export function Login() {
       await login(email, password)
       toast.success("Welcome back!")
       const redirectTo =
-        typeof location.state?.from === "string" ? location.state.from : "/browse"
+        typeof location.state?.from === "string" ? location.state.from : "/map"
       navigate(redirectTo)
     } catch (error) {
       const message =

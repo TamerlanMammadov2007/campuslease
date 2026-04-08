@@ -44,7 +44,10 @@ export function Landing() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Button asChild size="lg">
-                <Link to="/login">Log In to Browse</Link>
+                <Link to="/map">Browse Listings</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link to="/login">Sign In</Link>
               </Button>
             </div>
           </div>

@@ -43,8 +43,7 @@ export function PropertyDetails() {
   const handleSendMessage = async () => {
     if (!message.trim()) return
     if (!isAuthenticated) {
-      toast.error("Please log in to message owners.")
-      navigate("/login")
+      navigate("/login", { state: { from: `/properties/${id}` } })
       return
     }
     setIsSending(true)
