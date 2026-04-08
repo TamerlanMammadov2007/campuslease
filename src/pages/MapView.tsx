@@ -29,15 +29,82 @@ const defaultFilters: PropertyFiltersState = {
 const defaultImage =
   "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=600&auto=format&fit=crop"
 
+// Known university coordinates — partial matches work (e.g. "georgia tech" matches)
+const UNIVERSITY_COORDS: { keywords: string[]; coords: { lat: number; lng: number }; zoom: number }[] = [
+  { keywords: ["georgia tech", "georgia institute"], coords: { lat: 33.7756, lng: -84.3963 }, zoom: 15 },
+  { keywords: ["ut austin", "university of texas at austin", "texas austin"], coords: { lat: 30.2849, lng: -97.7341 }, zoom: 15 },
+  { keywords: ["ucla", "uc los angeles", "california los angeles"], coords: { lat: 34.0689, lng: -118.4452 }, zoom: 15 },
+  { keywords: ["usc", "university of southern california"], coords: { lat: 34.0224, lng: -118.2851 }, zoom: 15 },
+  { keywords: ["uc berkeley", "berkeley", "cal berkeley"], coords: { lat: 37.8724, lng: -122.2595 }, zoom: 15 },
+  { keywords: ["stanford"], coords: { lat: 37.4275, lng: -122.1697 }, zoom: 15 },
+  { keywords: ["harvard"], coords: { lat: 42.3770, lng: -71.1167 }, zoom: 15 },
+  { keywords: ["mit", "massachusetts institute"], coords: { lat: 42.3601, lng: -71.0942 }, zoom: 15 },
+  { keywords: ["nyu", "new york university"], coords: { lat: 40.7295, lng: -73.9965 }, zoom: 15 },
+  { keywords: ["columbia"], coords: { lat: 40.8075, lng: -73.9626 }, zoom: 15 },
+  { keywords: ["yale"], coords: { lat: 41.3163, lng: -72.9223 }, zoom: 15 },
+  { keywords: ["princeton"], coords: { lat: 40.3431, lng: -74.6551 }, zoom: 15 },
+  { keywords: ["university of michigan", "umich", "michigan ann arbor"], coords: { lat: 42.2780, lng: -83.7382 }, zoom: 15 },
+  { keywords: ["ohio state", "osu columbus"], coords: { lat: 40.0076, lng: -83.0300 }, zoom: 15 },
+  { keywords: ["penn state", "pennsylvania state"], coords: { lat: 40.7982, lng: -77.8599 }, zoom: 15 },
+  { keywords: ["university of florida", "uf gainesville"], coords: { lat: 29.6436, lng: -82.3549 }, zoom: 15 },
+  { keywords: ["florida state", "fsu"], coords: { lat: 30.4418, lng: -84.2985 }, zoom: 15 },
+  { keywords: ["university of georgia", "uga"], coords: { lat: 33.9480, lng: -83.3774 }, zoom: 15 },
+  { keywords: ["emory"], coords: { lat: 33.7940, lng: -84.3248 }, zoom: 15 },
+  { keywords: ["unc", "university of north carolina", "chapel hill"], coords: { lat: 35.9049, lng: -79.0469 }, zoom: 15 },
+  { keywords: ["duke"], coords: { lat: 36.0014, lng: -78.9382 }, zoom: 15 },
+  { keywords: ["vanderbilt"], coords: { lat: 36.1447, lng: -86.8027 }, zoom: 15 },
+  { keywords: ["university of chicago", "uchicago"], coords: { lat: 41.7886, lng: -87.5987 }, zoom: 15 },
+  { keywords: ["northwestern"], coords: { lat: 42.0565, lng: -87.6753 }, zoom: 15 },
+  { keywords: ["purdue"], coords: { lat: 40.4259, lng: -86.9081 }, zoom: 15 },
+  { keywords: ["university of washington", "uw seattle"], coords: { lat: 47.6553, lng: -122.3035 }, zoom: 15 },
+  { keywords: ["university of colorado", "cu boulder"], coords: { lat: 40.0076, lng: -105.2659 }, zoom: 15 },
+  { keywords: ["arizona state", "asu tempe"], coords: { lat: 33.4255, lng: -111.9400 }, zoom: 15 },
+  { keywords: ["university of arizona", "uarizona"], coords: { lat: 32.2319, lng: -110.9501 }, zoom: 15 },
+  { keywords: ["texas a&m", "texas a and m", "tamu"], coords: { lat: 30.6187, lng: -96.3365 }, zoom: 15 },
+  { keywords: ["rice university", "rice houston"], coords: { lat: 29.7174, lng: -95.4018 }, zoom: 15 },
+  { keywords: ["tulane"], coords: { lat: 29.9401, lng: -90.1213 }, zoom: 15 },
+  { keywords: ["lsu", "louisiana state"], coords: { lat: 30.4133, lng: -91.1800 }, zoom: 15 },
+  { keywords: ["university of miami", "um coral gables"], coords: { lat: 25.7214, lng: -80.2792 }, zoom: 15 },
+  { keywords: ["boston university", "bu boston"], coords: { lat: 42.3505, lng: -71.1054 }, zoom: 15 },
+  { keywords: ["northeastern"], coords: { lat: 42.3398, lng: -71.0892 }, zoom: 15 },
+  { keywords: ["carnegie mellon", "cmu pittsburgh"], coords: { lat: 40.4433, lng: -79.9436 }, zoom: 15 },
+  { keywords: ["university of pittsburgh", "pitt"], coords: { lat: 40.4444, lng: -79.9608 }, zoom: 15 },
+  { keywords: ["rutgers"], coords: { lat: 40.5008, lng: -74.4474 }, zoom: 15 },
+  { keywords: ["virginia tech", "vt blacksburg"], coords: { lat: 37.2284, lng: -80.4234 }, zoom: 15 },
+  { keywords: ["university of virginia", "uva"], coords: { lat: 38.0336, lng: -78.5080 }, zoom: 15 },
+]
+
+function findUniversityCoords(query: string) {
+  const q = query.toLowerCase().trim()
+  if (!q) return null
+  for (const entry of UNIVERSITY_COORDS) {
+    if (entry.keywords.some((kw) => q.includes(kw) || kw.includes(q))) {
+      return entry
+    }
+  }
+  return null
+}
+
 export function MapView() {
   const { data: properties = [], isLoading } = useProperties()
   const [filters, setFilters] = React.useState(defaultFilters)
   const [selectedId, setSelectedId] = React.useState<string | null>(null)
   const [showFullMap, setShowFullMap] = React.useState(false)
+  const mapRef = React.useRef<google.maps.Map | null>(null)
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey ?? "",
   })
+
+  // Pan map when university filter changes
+  React.useEffect(() => {
+    if (!mapRef.current) return
+    const match = findUniversityCoords(filters.university)
+    if (match) {
+      mapRef.current.panTo(match.coords)
+      mapRef.current.setZoom(match.zoom)
+    }
+  }, [filters.university])
 
   const filtered = properties.filter((property) => {
     if (
@@ -93,6 +160,7 @@ export function MapView() {
           center={mapCenter}
           zoom={12}
           mapContainerClassName="h-full w-full"
+          onLoad={(map) => { mapRef.current = map }}
           options={{
             clickableIcons: false,
             streetViewControl: false,
