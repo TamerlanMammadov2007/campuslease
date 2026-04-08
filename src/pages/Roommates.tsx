@@ -214,27 +214,32 @@ export function Roommates() {
                   <Camera className="mx-auto mb-2" />
                   Upload profile photo
                 </div>
-                <div className="grid gap-3 md:grid-cols-2">
-                  <Input
-                    placeholder="Budget min"
-                    value={draft.budgetMin || ""}
-                    onChange={(event) =>
-                      setDraft({
-                        ...draft,
-                        budgetMin: Number(event.target.value) || 0,
-                      })
-                    }
-                  />
-                  <Input
-                    placeholder="Budget max"
-                    value={draft.budgetMax || ""}
-                    onChange={(event) =>
-                      setDraft({
-                        ...draft,
-                        budgetMax: Number(event.target.value) || 0,
-                      })
-                    }
-                  />
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Monthly Budget ($)</p>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <Input
+                      placeholder="Min (e.g. 500)"
+                      type="number"
+                      value={draft.budgetMin || ""}
+                      onChange={(event) =>
+                        setDraft({
+                          ...draft,
+                          budgetMin: Number(event.target.value) || 0,
+                        })
+                      }
+                    />
+                    <Input
+                      placeholder="Max (e.g. 1500)"
+                      type="number"
+                      value={draft.budgetMax || ""}
+                      onChange={(event) =>
+                        setDraft({
+                          ...draft,
+                          budgetMax: Number(event.target.value) || 0,
+                        })
+                      }
+                    />
+                  </div>
                 </div>
                 <Input
                   placeholder="Move-in date"

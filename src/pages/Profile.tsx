@@ -216,6 +216,7 @@ export function Profile() {
                 setProfile({ ...profile, leaseDuration: event.target.value })
               }
             >
+              <option>3 months</option>
               <option>6 months</option>
               <option>9 months</option>
               <option>12 months</option>
