@@ -1,11 +1,11 @@
 import React from "react"
-import { GoogleMap, InfoWindow, Marker, useLoadScript } from "@react-google-maps/api"
+import { GoogleMap, OverlayView, InfoWindow, useLoadScript } from "@react-google-maps/api"
 import { Link } from "react-router-dom"
+import { Bed, Bath, X } from "lucide-react"
 
 import { Breadcrumb } from "@/components/Breadcrumb"
 import { PropertyFilters } from "@/components/properties/PropertyFilters"
 import type { PropertyFiltersState } from "@/components/properties/PropertyFilters"
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useProperties } from "@/hooks/useProperties"
 
@@ -23,6 +23,9 @@ const defaultFilters: PropertyFiltersState = {
   amenities: [],
 }
 
+const defaultImage =
+  "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=600&auto=format&fit=crop"
+
 export function MapView() {
   const { data: properties = [] } = useProperties()
   const [filters, setFilters] = React.useState(defaultFilters)
@@ -38,9 +41,8 @@ export function MapView() {
       !`${property.address} ${property.city}`
         .toLowerCase()
         .includes(filters.query.toLowerCase())
-    ) {
+    )
       return false
-    }
     if (filters.type && property.type !== filters.type) return false
     if (filters.bedrooms && property.bedrooms < Number(filters.bedrooms))
       return false
@@ -53,10 +55,9 @@ export function MapView() {
     if (filters.parking && !property.parkingAvailable) return false
     if (
       filters.amenities.length &&
-      !filters.amenities.every((amenity) => property.amenities.includes(amenity))
-    ) {
+      !filters.amenities.every((a) => property.amenities.includes(a))
+    )
       return false
-    }
     return true
   })
 
@@ -66,39 +67,23 @@ export function MapView() {
       lng: -97.7361,
     }
 
-  const selected = filtered.find((property) => property.id === selectedId)
-  const defaultImage =
-    "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=300&auto=format&fit=crop"
-
-  const getMarkerIcon = React.useCallback(
-    (url?: string) => {
-      const maps = (window as any).google?.maps
-      if (!maps) return undefined
-      const safeUrl = (url || defaultImage).replace(/'/g, "%27")
-      return {
-        url: safeUrl,
-        scaledSize: new maps.Size(54, 54),
-        anchor: new maps.Point(27, 54),
-      }
-    },
-    [defaultImage],
-  )
+  const selected = filtered.find((p) => p.id === selectedId)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Breadcrumb items={[{ label: "Map View" }]} />
       <PropertyFilters value={filters} onChange={setFilters} />
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
-        <div className="h-[520px] overflow-hidden rounded-3xl border border-white/10">
+
+      <div className="flex gap-4" style={{ height: "calc(100vh - 220px)", minHeight: 500 }}>
+        {/* Map */}
+        <div className="flex-1 overflow-hidden rounded-3xl border border-white/10">
           {!apiKey ? (
             <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-300">
-              Add VITE_GOOGLE_MAPS_API_KEY to your .env file to load Google
-              Maps.
+              Add VITE_GOOGLE_MAPS_API_KEY to your environment to load the map.
             </div>
           ) : loadError ? (
             <div className="flex h-full items-center justify-center px-6 text-center text-sm text-red-200">
-              Google Maps failed to load. Check your API key and billing
-              settings.
+              Google Maps failed to load. Check your API key.
             </div>
           ) : !isLoaded ? (
             <div className="flex h-full items-center justify-center text-sm text-slate-300">
@@ -108,45 +93,80 @@ export function MapView() {
             <GoogleMap
               key={`${mapCenter.lat}-${mapCenter.lng}`}
               center={mapCenter}
-              zoom={11}
+              zoom={12}
               mapContainerClassName="h-full w-full"
               options={{
                 clickableIcons: false,
                 streetViewControl: false,
                 mapTypeControl: false,
                 fullscreenControl: false,
+                zoomControlOptions: {
+                  position: (window as any).google.maps.ControlPosition.RIGHT_BOTTOM,
+                },
               }}
             >
               {filtered.map((property) => (
-                <Marker
+                <OverlayView
                   key={property.id}
                   position={property.coordinates}
-                  icon={getMarkerIcon(property.images[0])}
-                  onClick={() => setSelectedId(property.id)}
-                />
+                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                >
+                  <button
+                    onClick={() =>
+                      setSelectedId(
+                        selectedId === property.id ? null : property.id,
+                      )
+                    }
+                    style={{
+                      transform: "translate(-50%, -100%)",
+                      whiteSpace: "nowrap",
+                    }}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-bold shadow-lg transition-transform hover:scale-105 ${
+                      selectedId === property.id
+                        ? "bg-orange-400 text-slate-900"
+                        : "bg-slate-900 text-white"
+                    }`}
+                  >
+                    ${property.price.toLocaleString()}/mo
+                  </button>
+                </OverlayView>
               ))}
+
               {selected ? (
                 <InfoWindow
                   position={selected.coordinates}
                   onCloseClick={() => setSelectedId(null)}
+                  options={{ pixelOffset: new (window as any).google.maps.Size(0, -40) }}
                 >
-                  <div className="space-y-2">
-                    <img
-                      src={
-                        selected.images[0] ??
-                        "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop"
-                      }
-                      alt={selected.title}
-                      className="h-20 w-full rounded-lg object-cover"
-                    />
-                    <div className="text-sm font-semibold">
-                      {selected.title}
+                  <div className="w-56 overflow-hidden rounded-xl">
+                    <div className="relative">
+                      <img
+                        src={selected.images[0] ?? defaultImage}
+                        alt={selected.title}
+                        className="h-32 w-full object-cover"
+                      />
                     </div>
-                    <div className="text-xs text-slate-600">
-                      {selected.address}, {selected.city}
-                    </div>
-                    <div className="text-xs font-semibold text-orange-600">
-                      ${selected.price}/mo
+                    <div className="space-y-1.5 p-3">
+                      <p className="text-sm font-semibold leading-tight text-slate-900">
+                        {selected.title}
+                      </p>
+                      <p className="text-sm font-bold text-slate-900">
+                        ${selected.price.toLocaleString()}/mo
+                      </p>
+                      <div className="flex gap-3 text-xs text-slate-600">
+                        <span className="flex items-center gap-1">
+                          <Bed size={12} /> {selected.bedrooms} Bed
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Bath size={12} /> {selected.bathrooms} Bath
+                        </span>
+                      </div>
+                      <Link
+                        to={`/properties/${selected.id}`}
+                        className="mt-2 block rounded-lg bg-slate-900 px-3 py-1.5 text-center text-xs font-semibold text-white hover:bg-slate-700"
+                      >
+                        View Details →
+                      </Link>
                     </div>
                   </div>
                 </InfoWindow>
@@ -154,52 +174,49 @@ export function MapView() {
             </GoogleMap>
           )}
         </div>
-        <div className="space-y-4">
-          {selected ? (
-            <Card className="border border-white/10 bg-white/10">
-              <CardContent className="space-y-3">
+
+        {/* Listing panel */}
+        <div className="hidden w-80 flex-shrink-0 overflow-y-auto lg:block">
+          <p className="mb-3 text-sm text-slate-300">
+            {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
+          </p>
+          <div className="space-y-3">
+            {filtered.map((property) => (
+              <button
+                key={property.id}
+                onClick={() =>
+                  setSelectedId(
+                    selectedId === property.id ? null : property.id,
+                  )
+                }
+                className={`w-full overflow-hidden rounded-2xl border text-left transition ${
+                  selectedId === property.id
+                    ? "border-orange-400/60 bg-orange-400/10"
+                    : "border-white/10 bg-white/5 hover:border-white/20"
+                }`}
+              >
                 <img
-                  src={
-                    selected.images[0] ??
-                    "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop"
-                  }
-                  alt={selected.title}
-                  className="h-36 w-full rounded-2xl object-cover"
+                  src={property.images[0] ?? defaultImage}
+                  alt={property.title}
+                  className="h-32 w-full object-cover"
                 />
-                <div>
-                  <p className="text-lg font-semibold text-white">
-                    {selected.title}
+                <div className="space-y-1 p-3">
+                  <p className="text-sm font-semibold text-white line-clamp-1">
+                    {property.title}
                   </p>
-                  <p className="text-xs text-slate-300">
-                    {selected.address}, {selected.city}
-                  </p>
+                  <p className="text-xs text-slate-400">{property.city}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-orange-300">
+                      ${property.price.toLocaleString()}/mo
+                    </span>
+                    <span className="text-xs text-slate-400">
+                      {property.bedrooms}bd · {property.bathrooms}ba
+                    </span>
+                  </div>
                 </div>
-                <div className="text-sm text-orange-200">
-                  ${selected.price}/mo
-                </div>
-                <div className="flex gap-2">
-                  <Button asChild size="sm">
-                    <Link to={`/properties/${selected.id}`}>
-                      View Details
-                    </Link>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setSelectedId(null)}
-                  >
-                    Close
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className="border border-white/10 bg-white/10">
-              <CardContent className="space-y-3 text-sm text-slate-300">
-                Select a marker to preview the property.
-              </CardContent>
-            </Card>
-          )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
