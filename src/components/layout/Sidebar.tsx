@@ -15,7 +15,7 @@ import { useApp } from "@/context/AppContext"
 
 const navItems = [
   { to: "/browse", label: "Browse Properties", icon: Home },
-  { to: "/map", label: "Map View", icon: MapPin },
+  { to: "/map", label: "Listings", icon: MapPin },
 { to: "/inbox", label: "Inbox", icon: MessageSquare },
   { to: "/favorites", label: "My Favorites", icon: Heart },
   { to: "/create", label: "List Your Property", icon: PlusCircle },
