@@ -37,9 +37,9 @@ function App() {
           path="/admin"
           element={
             <RequireAdmin>
-              <Layout>
+              <div className="min-h-screen bg-gray-950 p-8 text-white">
                 <AdminDashboard />
-              </Layout>
+              </div>
             </RequireAdmin>
           }
         />
