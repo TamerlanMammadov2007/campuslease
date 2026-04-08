@@ -318,6 +318,7 @@ function findUniversityCoords(query: string) {
 export function MapView() {
   const { data: properties = [], isLoading } = useProperties()
   const [filters, setFilters] = React.useState(defaultFilters)
+  const [sort, setSort] = React.useState("newest")
   const [selectedId, setSelectedId] = React.useState<string | null>(null)
   const [showFullMap, setShowFullMap] = React.useState(false)
   const mapRef = React.useRef<google.maps.Map | null>(null)
@@ -364,6 +365,13 @@ export function MapView() {
     )
       return false
     return true
+  })
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === "price-asc") return a.price - b.price
+    if (sort === "price-desc") return b.price - a.price
+    if (sort === "newest") return new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()
+    return 0
   })
 
   const mapCenter =
@@ -547,17 +555,28 @@ export function MapView() {
       {/* Filters */}
       <PropertyFilters value={filters} onChange={setFilters} />
 
-      {/* Count */}
-      <p className="text-sm text-slate-300">
-        <span className="font-semibold text-white">{filtered.length}</span> listings found
-      </p>
+      {/* Count + Sort */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-slate-300">
+          <span className="font-semibold text-white">{filtered.length}</span> listings found
+        </p>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="h-9 rounded-xl border border-white/15 bg-white/10 px-3 text-sm text-white"
+        >
+          <option value="newest">Newest first</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+        </select>
+      </div>
 
       {/* Listing cards */}
       {isLoading ? (
         <PropertyGridSkeleton />
       ) : (
         <motion.div layout className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((property) => (
+          {sorted.map((property) => (
             <motion.div
               key={property.id}
               layout

@@ -1,6 +1,6 @@
 import React from "react"
 import { useNavigate, useParams, Link } from "react-router-dom"
-import { Calendar, CheckCircle2, Mail, Phone } from "lucide-react"
+import { Calendar, CheckCircle2, Mail, Phone, ChevronLeft, ChevronRight, Share2 } from "lucide-react"
 import { format } from "date-fns"
 import { motion } from "framer-motion"
 
@@ -84,21 +84,53 @@ export function PropertyDetails() {
   return (
     <div className="space-y-8">
       <Breadcrumb items={[{ label: "Browse", href: "/browse" }, { label: property.title }]} />
-      <SectionHeader
-        eyebrow="Property Details"
-        title={property.title}
-        subtitle={`${property.address}, ${property.city}`}
-      />
+      <div className="flex items-start justify-between gap-4">
+        <SectionHeader
+          eyebrow="Property Details"
+          title={property.title}
+          subtitle={`${property.address}, ${property.city}`}
+        />
+        <button
+          onClick={() => {
+            void navigator.clipboard.writeText(window.location.href)
+            toast.success("Link copied to clipboard!")
+          }}
+          className="mt-1 flex shrink-0 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-slate-300 hover:bg-white/10"
+        >
+          <Share2 size={15} /> Share
+        </button>
+      </div>
 
       <div className="grid gap-8 lg:grid-cols-[1.4fr_0.6fr]">
         <div className="space-y-6">
           <Card className="overflow-hidden border border-white/10 bg-white/10">
             <CardContent className="space-y-4">
-              <img
-                src={images[activeImage]}
-                alt={property.title}
-                className="h-80 w-full rounded-2xl object-cover"
-              />
+              <div className="relative">
+                <img
+                  src={images[activeImage]}
+                  alt={property.title}
+                  className="h-80 w-full rounded-2xl object-cover"
+                />
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setActiveImage((activeImage - 1 + images.length) % images.length)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/70 text-white hover:bg-slate-900"
+                    >
+                      <ChevronLeft size={18} />
+                    </button>
+                    <button
+                      onClick={() => setActiveImage((activeImage + 1) % images.length)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/70 text-white hover:bg-slate-900"
+                    >
+                      <ChevronRight size={18} />
+                    </button>
+                    <div className="absolute bottom-3 right-3 rounded-full bg-slate-900/70 px-2 py-1 text-xs text-white">
+                      {activeImage + 1} / {images.length}
+                    </div>
+                  </>
+                )}
+              </div>
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {images.map((image, index) => (
                   <button
@@ -223,13 +255,29 @@ export function PropertyDetails() {
               </div>
             </CardContent>
           </Card>
+          {/* Mini map */}
+          <Card className="overflow-hidden border border-white/10">
+            <iframe
+              title="Property location"
+              width="100%"
+              height="200"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(`${property.address}, ${property.city}`)}&output=embed&z=15`}
+            />
+            <CardContent className="py-3">
+              <p className="text-xs text-slate-400">{property.address}, {property.city}</p>
+            </CardContent>
+          </Card>
+
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
             <Button asChild variant="outline" className="w-full">
-              <Link to="/browse">Back to Browse</Link>
+              <Link to="/map">Back to Listings</Link>
             </Button>
           </motion.div>
         </div>

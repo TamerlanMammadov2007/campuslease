@@ -1,6 +1,7 @@
-import { Heart, MapPin, Square, BedDouble, Bath, CheckSquare } from "lucide-react"
+import { Heart, MapPin, Square, BedDouble, Bath, CheckSquare, Clock } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
+import { formatDistanceToNow } from "date-fns"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -69,6 +70,12 @@ export function PropertyCard({ property }: PropertyCardProps) {
             <MapPin size={14} />
             {property.address}, {property.city}
           </div>
+          {property.createdDate && (
+            <div className="flex items-center gap-1 text-xs text-slate-500">
+              <Clock size={11} />
+              {formatDistanceToNow(new Date(property.createdDate), { addSuffix: true })}
+            </div>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-3 text-xs text-slate-200">
           <span className="flex items-center gap-1">
