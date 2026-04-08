@@ -1,4 +1,5 @@
 import React from "react"
+import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -12,6 +13,7 @@ export function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = React.useState("")
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [hasSession, setHasSession] = React.useState(false)
+  const navigate = useNavigate()
 
   React.useEffect(() => {
     let mounted = true
@@ -47,6 +49,8 @@ export function ResetPassword() {
       const { error } = await supabase.auth.updateUser({ password })
       if (error) throw error
       toast.success("Password updated. You can log in now.")
+      await supabase.auth.signOut()
+      navigate("/login")
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Password reset failed."
