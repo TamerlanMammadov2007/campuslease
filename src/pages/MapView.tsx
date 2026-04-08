@@ -355,8 +355,9 @@ export function MapView() {
         ))}
       </div>
       {filtered.length === 0 && (
-        <div className="py-16 text-center text-slate-400">
-          No listings match your filters.
+        <div className="py-16 text-center">
+          <p className="text-lg font-semibold text-white">No results found</p>
+          <p className="mt-2 text-sm text-slate-400">Try adjusting your filters or clearing them to see more listings.</p>
         </div>
       )}
     </div>
