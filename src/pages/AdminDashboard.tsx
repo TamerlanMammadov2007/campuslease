@@ -3,6 +3,7 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { SectionHeader } from "@/components/SectionHeader"
 import {
   useAdminApplications,
@@ -16,6 +17,24 @@ import {
   useAdminUsers,
 } from "@/hooks/useAdmin"
 import { supabase } from "@/lib/supabase"
+
+function exportCSV(filename: string, rows: Record<string, unknown>[]) {
+  if (!rows.length) return
+  const headers = Object.keys(rows[0])
+  const csv = [
+    headers.join(","),
+    ...rows.map((row) =>
+      headers.map((h) => JSON.stringify(row[h] ?? "")).join(","),
+    ),
+  ].join("\n")
+  const blob = new Blob([csv], { type: "text/csv" })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 export function AdminDashboard() {
   const { data: stats } = useAdminStats()
@@ -37,17 +56,59 @@ export function AdminDashboard() {
     status: "available",
   })
   const [editingUserId, setEditingUserId] = React.useState<string | null>(null)
-  const [userDraft, setUserDraft] = React.useState({
-    name: "",
-  })
+  const [userDraft, setUserDraft] = React.useState({ name: "" })
+
+  const [userSearch, setUserSearch] = React.useState("")
+  const [listingSearch, setListingSearch] = React.useState("")
+  const [showAllUsers, setShowAllUsers] = React.useState(false)
+  const [showAllListings, setShowAllListings] = React.useState(false)
+  const [showAllApplications, setShowAllApplications] = React.useState(false)
+  const [showAllThreads, setShowAllThreads] = React.useState(false)
+  const [expandedApplicationId, setExpandedApplicationId] = React.useState<string | null>(null)
+
+  const filteredUsers = useMemo(
+    () =>
+      users.filter(
+        (u) =>
+          u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
+          u.email.toLowerCase().includes(userSearch.toLowerCase()),
+      ),
+    [users, userSearch],
+  )
+
+  const filteredListings = useMemo(
+    () =>
+      listings.filter(
+        (l) =>
+          l.title.toLowerCase().includes(listingSearch.toLowerCase()) ||
+          l.city.toLowerCase().includes(listingSearch.toLowerCase()),
+      ),
+    [listings, listingSearch],
+  )
+
+  const visibleUsers = showAllUsers ? filteredUsers : filteredUsers.slice(0, 6)
+  const visibleListings = showAllListings ? filteredListings : filteredListings.slice(0, 6)
+  const visibleApplications = showAllApplications ? applications : applications.slice(0, 6)
+  const visibleThreads = showAllThreads ? threads : threads.slice(0, 6)
 
   const summaryCards = useMemo(
     () => [
-      { label: "Users", value: stats?.users ?? 0 },
+      { label: "Total Users", value: stats?.users ?? 0 },
+      { label: "New This Week", value: stats?.newUsersThisWeek ?? 0 },
       { label: "Listings", value: stats?.listings ?? 0 },
       { label: "Applications", value: stats?.applications ?? 0 },
       { label: "Threads", value: stats?.threads ?? 0 },
       { label: "Messages", value: stats?.messages ?? 0 },
+      { label: "Roommate Profiles", value: stats?.roommateProfiles ?? 0 },
+    ],
+    [stats],
+  )
+
+  const statusCards = useMemo(
+    () => [
+      { label: "Available", value: stats?.availableListings ?? 0, color: "text-emerald-300" },
+      { label: "Pending", value: stats?.pendingListings ?? 0, color: "text-amber-300" },
+      { label: "Leased", value: stats?.leasedListings ?? 0, color: "text-slate-400" },
     ],
     [stats],
   )
@@ -98,9 +159,7 @@ export function AdminDashboard() {
 
   const startEditUser = (user: typeof users[number]) => {
     setEditingUserId(user.id)
-    setUserDraft({
-      name: user.name,
-    })
+    setUserDraft({ name: user.name })
   }
 
   const handleSaveListing = async () => {
@@ -152,9 +211,7 @@ export function AdminDashboard() {
     try {
       await updateUser({
         id: editingUserId,
-        data: {
-          name: userDraft.name,
-        },
+        data: { name: userDraft.name },
       })
       toast.success("User updated.")
       setEditingUserId(null)
@@ -180,7 +237,8 @@ export function AdminDashboard() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+      {/* Main stats */}
+      <div className="grid gap-4 md:grid-cols-4 xl:grid-cols-7">
         {summaryCards.map((card) => (
           <Card key={card.label} className="border border-white/10 bg-white/10">
             <CardContent className="space-y-1">
@@ -193,157 +251,285 @@ export function AdminDashboard() {
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border border-white/10 bg-white/10">
-          <CardContent className="space-y-4">
-            <p className="text-sm font-semibold text-white">Recent Users</p>
-            {users.slice(0, 6).map((user) => (
-              <div key={user.id} className="rounded-2xl border border-white/10 p-3 text-sm text-slate-200">
-                <div className="flex items-center justify-between">
-                  <span>{user.name}</span>
-                  <span className="text-xs text-slate-400">{user.email}</span>
-                </div>
-                {editingUserId === user.id ? (
-                  <div className="mt-3 space-y-2">
-                    <input
-                      className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
-                      value={userDraft.name}
-                      onChange={(event) =>
-                        setUserDraft((prev) => ({ ...prev, name: event.target.value }))
-                      }
-                    />
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={handleSaveUser}>
-                        Save
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => setEditingUserId(null)}>
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <Button size="sm" variant="ghost" onClick={() => startEditUser(user)}>
-                    Edit
-                  </Button>
-                )}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card className="border border-white/10 bg-white/10">
-          <CardContent className="space-y-4">
-            <p className="text-sm font-semibold text-white">Recent Listings</p>
-            {listings.slice(0, 6).map((listing) => (
-              <div key={listing.id} className="rounded-2xl border border-white/10 p-3 text-sm text-slate-200">
-                <div className="flex items-center justify-between">
-                  <span>{listing.title}</span>
-                  <span className="text-xs text-slate-400">
-                    {listing.owner?.email ?? "Unknown owner"} · ${listing.price}/mo
-                  </span>
-                </div>
-                {editingListingId === listing.id ? (
-                  <div className="mt-3 space-y-2">
-                    <input
-                      className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
-                      value={listingDraft.title}
-                      onChange={(event) =>
-                        setListingDraft((prev) => ({ ...prev, title: event.target.value }))
-                      }
-                    />
-                    <input
-                      className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
-                      value={listingDraft.city}
-                      onChange={(event) =>
-                        setListingDraft((prev) => ({ ...prev, city: event.target.value }))
-                      }
-                    />
-                    <input
-                      type="number"
-                      className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
-                      value={listingDraft.price}
-                      onChange={(event) =>
-                        setListingDraft((prev) => ({
-                          ...prev,
-                          price: Number(event.target.value),
-                        }))
-                      }
-                    />
-                    <select
-                      className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
-                      value={listingDraft.status}
-                      onChange={(event) =>
-                        setListingDraft((prev) => ({ ...prev, status: event.target.value }))
-                      }
-                    >
-                      <option value="available">Available</option>
-                      <option value="pending">Pending</option>
-                      <option value="leased">Leased</option>
-                    </select>
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={handleSaveListing}>
-                        Save
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => setEditingListingId(null)}>
-                        Cancel
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => handleDeleteListing(listing.id)}>
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mt-2 flex gap-2">
-                    <Button size="sm" variant="ghost" onClick={() => startEditListing(listing)}>
-                      Edit
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => handleDeleteListing(listing.id)}>
-                      Delete
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+      {/* Listing status breakdown */}
+      <div className="grid gap-4 md:grid-cols-3">
+        {statusCards.map((card) => (
+          <Card key={card.label} className="border border-white/10 bg-white/10">
+            <CardContent className="flex items-center justify-between">
+              <p className="text-sm text-slate-300">Listings — {card.label}</p>
+              <p className={`text-2xl font-semibold ${card.color}`}>{card.value}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
+      {/* Users */}
+      <Card className="border border-white/10 bg-white/10">
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-white">
+              Users ({filteredUsers.length})
+            </p>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Search users..."
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                className="w-48"
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  exportCSV(
+                    "users.csv",
+                    users.map((u) => ({
+                      name: u.name,
+                      email: u.email,
+                      joined: u.created_at,
+                    })),
+                  )
+                }
+              >
+                Export CSV
+              </Button>
+            </div>
+          </div>
+          {visibleUsers.map((user) => (
+            <div key={user.id} className="rounded-2xl border border-white/10 p-3 text-sm text-slate-200">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span className="font-medium">{user.name}</span>
+                  <span className="ml-3 text-xs text-slate-400">{user.email}</span>
+                </div>
+                <span className="text-xs text-slate-500">
+                  Joined {new Date(user.created_at).toLocaleDateString()}
+                </span>
+              </div>
+              {editingUserId === user.id ? (
+                <div className="mt-3 space-y-2">
+                  <input
+                    className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
+                    value={userDraft.name}
+                    onChange={(event) =>
+                      setUserDraft((prev) => ({ ...prev, name: event.target.value }))
+                    }
+                  />
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={handleSaveUser}>Save</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingUserId(null)}>Cancel</Button>
+                  </div>
+                </div>
+              ) : (
+                <Button size="sm" variant="ghost" onClick={() => startEditUser(user)}>
+                  Edit
+                </Button>
+              )}
+            </div>
+          ))}
+          {filteredUsers.length > 6 && (
+            <Button variant="ghost" size="sm" onClick={() => setShowAllUsers((v) => !v)}>
+              {showAllUsers ? "Show less" : `Show all ${filteredUsers.length} users`}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Listings */}
+      <Card className="border border-white/10 bg-white/10">
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-white">
+              Listings ({filteredListings.length})
+            </p>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Search listings..."
+                value={listingSearch}
+                onChange={(e) => setListingSearch(e.target.value)}
+                className="w-48"
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  exportCSV(
+                    "listings.csv",
+                    listings.map((l) => ({
+                      title: l.title,
+                      city: l.city,
+                      price: l.price,
+                      status: l.status,
+                      owner: l.owner.email,
+                      created: l.createdDate,
+                    })),
+                  )
+                }
+              >
+                Export CSV
+              </Button>
+            </div>
+          </div>
+          {visibleListings.map((listing) => (
+            <div key={listing.id} className="rounded-2xl border border-white/10 p-3 text-sm text-slate-200">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-medium">{listing.title}</span>
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <span
+                    className={
+                      listing.status === "available"
+                        ? "text-emerald-300"
+                        : listing.status === "pending"
+                          ? "text-amber-300"
+                          : "text-slate-400"
+                    }
+                  >
+                    {listing.status}
+                  </span>
+                  <span>{listing.owner?.email ?? "Unknown owner"}</span>
+                  <span>${listing.price}/mo</span>
+                  <span>{listing.city}</span>
+                </div>
+              </div>
+              {editingListingId === listing.id ? (
+                <div className="mt-3 space-y-2">
+                  <input
+                    className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
+                    value={listingDraft.title}
+                    onChange={(event) =>
+                      setListingDraft((prev) => ({ ...prev, title: event.target.value }))
+                    }
+                  />
+                  <input
+                    className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
+                    value={listingDraft.city}
+                    onChange={(event) =>
+                      setListingDraft((prev) => ({ ...prev, city: event.target.value }))
+                    }
+                  />
+                  <input
+                    type="number"
+                    className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
+                    value={listingDraft.price}
+                    onChange={(event) =>
+                      setListingDraft((prev) => ({ ...prev, price: Number(event.target.value) }))
+                    }
+                  />
+                  <select
+                    className="h-10 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white"
+                    value={listingDraft.status}
+                    onChange={(event) =>
+                      setListingDraft((prev) => ({ ...prev, status: event.target.value }))
+                    }
+                  >
+                    <option value="available">Available</option>
+                    <option value="pending">Pending</option>
+                    <option value="leased">Leased</option>
+                  </select>
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={handleSaveListing}>Save</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingListingId(null)}>Cancel</Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleDeleteListing(listing.id)}>Delete</Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-2 flex gap-2">
+                  <Button size="sm" variant="ghost" onClick={() => startEditListing(listing)}>Edit</Button>
+                  <Button size="sm" variant="ghost" onClick={() => handleDeleteListing(listing.id)}>Delete</Button>
+                </div>
+              )}
+            </div>
+          ))}
+          {filteredListings.length > 6 && (
+            <Button variant="ghost" size="sm" onClick={() => setShowAllListings((v) => !v)}>
+              {showAllListings ? "Show less" : `Show all ${filteredListings.length} listings`}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="grid gap-6 lg:grid-cols-2">
+        {/* Applications */}
         <Card className="border border-white/10 bg-white/10">
           <CardContent className="space-y-4">
-            <p className="text-sm font-semibold text-white">Applications</p>
-            {applications.slice(0, 6).map((application) => (
-              <div key={application.id} className="text-sm text-slate-200">
-                <p className="font-semibold">
-                  {application.name} · {application.email}
-                </p>
-                <p className="text-xs text-slate-400">
-                  {application.listing_title ?? `Listing ${application.listing_id}`}
+            <p className="text-sm font-semibold text-white">
+              Applications ({applications.length})
+            </p>
+            {visibleApplications.map((application) => (
+              <div key={application.id} className="rounded-2xl border border-white/10 p-3 text-sm text-slate-200">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className="font-semibold">
+                      {application.name}
+                    </p>
+                    <p className="text-xs text-slate-400">{application.email}</p>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    {application.listing_title ?? `Listing ${application.listing_id}`}
+                  </p>
+                </div>
+                {application.message && (
+                  <div className="mt-2">
+                    {expandedApplicationId === application.id ? (
+                      <p className="text-xs text-slate-300">{application.message}</p>
+                    ) : (
+                      <p className="truncate text-xs text-slate-400">{application.message}</p>
+                    )}
+                    <button
+                      className="mt-1 text-xs text-orange-300 hover:text-orange-200"
+                      onClick={() =>
+                        setExpandedApplicationId(
+                          expandedApplicationId === application.id ? null : application.id,
+                        )
+                      }
+                    >
+                      {expandedApplicationId === application.id ? "Show less" : "Show message"}
+                    </button>
+                  </div>
+                )}
+                <p className="mt-1 text-xs text-slate-500">
+                  {new Date(application.created_at).toLocaleDateString()}
                 </p>
               </div>
             ))}
+            {applications.length > 6 && (
+              <Button variant="ghost" size="sm" onClick={() => setShowAllApplications((v) => !v)}>
+                {showAllApplications ? "Show less" : `Show all ${applications.length} applications`}
+              </Button>
+            )}
           </CardContent>
         </Card>
 
+        {/* Threads */}
         <Card className="border border-white/10 bg-white/10">
           <CardContent className="space-y-4">
-            <p className="text-sm font-semibold text-white">Threads</p>
-            {threads.slice(0, 6).map((thread) => (
-              <div key={thread.id} className="text-sm text-slate-200">
+            <p className="text-sm font-semibold text-white">
+              Threads ({threads.length})
+            </p>
+            {visibleThreads.map((thread) => (
+              <div key={thread.id} className="rounded-2xl border border-white/10 p-3 text-sm text-slate-200">
                 <p className="font-semibold">{thread.participantName}</p>
                 <p className="text-xs text-slate-400">
                   {thread.propertyTitle ?? "Roommate thread"}
                 </p>
               </div>
             ))}
+            {threads.length > 6 && (
+              <Button variant="ghost" size="sm" onClick={() => setShowAllThreads((v) => !v)}>
+                {showAllThreads ? "Show less" : `Show all ${threads.length} threads`}
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
 
+      {/* Login events */}
       <Card className="border border-white/10 bg-white/10">
         <CardContent className="space-y-4">
-          <p className="text-sm font-semibold text-white">Recent Login Events</p>
-          {loginEvents.slice(0, 8).map((event) => (
+          <p className="text-sm font-semibold text-white">
+            Recent Login Events
+          </p>
+          {loginEvents.slice(0, 10).map((event) => (
             <div key={event.id} className="flex items-center justify-between text-sm text-slate-200">
               <span>{event.email}</span>
               <span className="text-xs text-slate-400">

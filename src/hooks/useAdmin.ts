@@ -9,6 +9,11 @@ type AdminStats = {
   applications: number
   threads: number
   messages: number
+  roommateProfiles: number
+  newUsersThisWeek: number
+  availableListings: number
+  pendingListings: number
+  leasedListings: number
 }
 
 type AdminUser = {
@@ -42,18 +47,29 @@ export function useAdminStats() {
   return useQuery({
     queryKey: ["admin", "stats"],
     queryFn: async (): Promise<AdminStats> => {
+      const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
       const [
         users,
         listings,
         applications,
         threads,
         messages,
+        roommateProfiles,
+        newUsers,
+        availableListings,
+        pendingListings,
+        leasedListings,
       ] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("listings").select("id", { count: "exact", head: true }),
         supabase.from("applications").select("id", { count: "exact", head: true }),
         supabase.from("threads").select("id", { count: "exact", head: true }),
         supabase.from("messages").select("id", { count: "exact", head: true }),
+        supabase.from("roommate_profiles").select("id", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", oneWeekAgo),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "available"),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "pending"),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "leased"),
       ])
 
       if (users.error) throw users.error
@@ -68,6 +84,11 @@ export function useAdminStats() {
         applications: applications.count ?? 0,
         threads: threads.count ?? 0,
         messages: messages.count ?? 0,
+        roommateProfiles: roommateProfiles.count ?? 0,
+        newUsersThisWeek: newUsers.count ?? 0,
+        availableListings: availableListings.count ?? 0,
+        pendingListings: pendingListings.count ?? 0,
+        leasedListings: leasedListings.count ?? 0,
       }
     },
   })
