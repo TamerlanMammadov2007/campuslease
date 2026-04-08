@@ -31,14 +31,12 @@ export function AdminLogin() {
       if (!user) {
         throw new Error("Admin login failed.")
       }
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile } = await supabase
         .from("profiles")
         .select("is_admin,email")
         .eq("id", user.id)
         .maybeSingle()
-      if (profileError) throw new Error(`Profile error: ${profileError.message}`)
-      if (!profile) throw new Error(`No profile found for user ID: ${user.id}`)
-      if (!profile.is_admin) {
+      if (!profile?.is_admin) {
         try {
           await supabase.auth.signOut()
         } finally {
