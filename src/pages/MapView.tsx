@@ -481,7 +481,7 @@ export function MapView() {
           <MapComponent height="h-full" />
         </div>
 
-        <div className="hidden w-80 flex-shrink-0 overflow-y-auto border-l border-white/10 bg-slate-950 p-4 lg:block">
+        {filtered.length > 0 && <div className="hidden w-80 flex-shrink-0 overflow-y-auto border-l border-white/10 bg-slate-950 p-4 lg:block">
           <div className="space-y-3">
             {filtered.map((property) => (
               <button
@@ -515,7 +515,7 @@ export function MapView() {
               </button>
             ))}
           </div>
-        </div>
+        </div>}
       </div>
     )
   }
