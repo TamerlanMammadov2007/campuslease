@@ -24,6 +24,7 @@ import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { SEO } from "@/components/SEO"
+import { useProperties } from "@/hooks/useProperties"
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -84,8 +85,8 @@ const landlordPerks = [
 
 const faqs = [
   {
-    q: "When will listings be available?",
-    a: "We're actively onboarding landlords now. Expect the first listings to go live very soon. List your property today to be among the first.",
+    q: "Are listings available now?",
+    a: "Yes — listings are live right now. Browse them on the Listings page, no account required.",
   },
   {
     q: "Is CampusLease free?",
@@ -126,6 +127,10 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 // ─── Landing ──────────────────────────────────────────────────────────────────
 
 export function Landing() {
+  const { data: properties = [] } = useProperties()
+  const listingCount = properties.length
+  const featured = properties[0] ?? null
+
   return (
     <>
       <SEO
@@ -145,7 +150,7 @@ export function Landing() {
           >
             <div className="space-y-7">
               <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/40 bg-orange-400/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-orange-200">
-                <Sparkles size={14} /> CampusLease — Coming Soon
+                <Sparkles size={14} /> CampusLease — Live Now
               </div>
               <h1 className="text-5xl font-bold leading-tight md:text-6xl">
                 Student Housing,<br />
@@ -156,13 +161,13 @@ export function Landing() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Button asChild size="lg">
-                  <Link to="/map">See How It Works <ArrowRight size={16} className="ml-1" /></Link>
+                  <Link to="/map">Browse Listings <ArrowRight size={16} className="ml-1" /></Link>
                 </Button>
                 <Button asChild size="lg" variant="outline">
                   <Link to="/create">List Your Property</Link>
                 </Button>
               </div>
-              <p className="text-sm text-slate-400">Free to use · No waitlist · Launching soon</p>
+              <p className="text-sm text-slate-400">Free to use · No account needed to browse · {listingCount > 0 ? `${listingCount} listing${listingCount !== 1 ? "s" : ""} live` : "Listings live now"}</p>
             </div>
 
             {/* Right card */}
@@ -174,28 +179,38 @@ export function Landing() {
             >
               <div className="absolute -left-8 -top-8 h-32 w-32 rounded-full bg-orange-400/20 blur-3xl" />
               <div className="absolute -bottom-8 -right-8 h-32 w-32 rounded-full bg-purple-500/20 blur-3xl" />
-              <Card className="relative overflow-hidden border border-white/10 bg-white/10 backdrop-blur">
-                <CardContent className="space-y-5 py-6">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-orange-300">Launching Soon</p>
-                  <div className="space-y-3">
-                    {[
-                      { label: "Student-focused listings", done: true },
-                      { label: "University search & filters", done: true },
-                      { label: "Direct landlord messaging", done: true },
-                      { label: "Live inventory", done: false },
-                    ].map((item) => (
-                      <div key={item.label} className="flex items-center gap-3 text-sm">
-                        <div className={`h-2 w-2 rounded-full ${item.done ? "bg-orange-400" : "bg-white/20"}`} />
-                        <span className={item.done ? "text-white" : "text-slate-500"}>{item.label}</span>
-                        {item.done && <span className="ml-auto text-xs text-orange-300">Ready</span>}
+              {featured ? (
+                <Link to={`/properties/${featured.id}`}>
+                  <Card className="relative overflow-hidden border border-white/10 bg-white/10 backdrop-blur transition hover:border-white/20">
+                    <CardContent className="space-y-4 py-5">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-orange-300">Latest Listing</p>
+                      <img
+                        src={featured.images[0] ?? "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop"}
+                        alt={featured.title}
+                        className="h-44 w-full rounded-xl object-cover"
+                      />
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold text-white line-clamp-1">{featured.title}</p>
+                          <p className="text-xs text-slate-400">{featured.city} · {featured.bedrooms}bd · {featured.bathrooms}ba</p>
+                        </div>
+                        <span className="rounded-full bg-gradient-to-r from-orange-400 to-amber-300 px-3 py-1.5 text-sm font-bold text-slate-900 shrink-0">
+                          ${featured.price.toLocaleString()}/mo
+                        </span>
                       </div>
-                    ))}
-                  </div>
-                  <div className="rounded-xl border border-orange-400/20 bg-orange-400/10 p-4 text-sm text-orange-200">
-                    🏠 Landlords are signing up now. Listings go live very soon.
-                  </div>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ) : (
+                <Card className="relative overflow-hidden border border-white/10 bg-white/10 backdrop-blur">
+                  <CardContent className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+                    <Building2 size={40} className="text-orange-300" />
+                    <p className="font-semibold text-white">Be the first to list</p>
+                    <p className="text-sm text-slate-400">Post your property and reach students near your campus.</p>
+                    <Button asChild size="sm"><Link to="/create">List Your Property</Link></Button>
+                  </CardContent>
+                </Card>
+              )}
             </motion.div>
           </motion.div>
         </section>
