@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useThreads } from "@/hooks/useThreads"
 import { useApp } from "@/context/AppContext"
+import { SEO } from "@/components/SEO"
 import { supabase } from "@/lib/supabase"
 
 export function Inbox() {
@@ -54,6 +55,7 @@ export function Inbox() {
 
   return (
     <div className="space-y-6">
+      <SEO title="Inbox" description="Your messages with property owners on CampusLease." url="/inbox" />
       <Breadcrumb items={[{ label: "Inbox" }]} />
       <SectionHeader
         eyebrow="Inbox"

@@ -3,6 +3,7 @@ import { Building2, ShieldCheck, Sparkles, Bed, Bath, MapPin } from "lucide-reac
 import { Link } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
+import { SEO } from "@/components/SEO"
 import { Card, CardContent } from "@/components/ui/card"
 import { useProperties } from "@/hooks/useProperties"
 
@@ -29,7 +30,13 @@ export function Landing() {
   const featured = properties[0] ?? null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-indigo-950 px-6 py-12 text-white">
+    <>
+      <SEO
+        title="Student Housing Near Your Campus"
+        description="Browse student-ready homes near your university. Find your perfect off-campus apartment, house, or studio."
+        url="/"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-indigo-950 px-6 py-12 text-white">
       <div className="mx-auto max-w-6xl space-y-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -142,5 +149,6 @@ export function Landing() {
         </div>
       </div>
     </div>
+    </>
   )
 }

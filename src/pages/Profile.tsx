@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useApp } from "@/context/AppContext"
 import { supabase } from "@/lib/supabase"
+import { SEO } from "@/components/SEO"
 
 type ProfileState = {
   phone: string
@@ -80,6 +81,7 @@ export function Profile() {
 
   return (
     <div className="space-y-6">
+      <SEO title="My Profile" description="Manage your CampusLease account and contact details." url="/profile" />
       <Breadcrumb items={[{ label: "Profile" }]} />
       <SectionHeader
         eyebrow="Profile"

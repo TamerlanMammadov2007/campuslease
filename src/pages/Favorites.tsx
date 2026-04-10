@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { PropertyCard } from "@/components/properties/PropertyCard"
 import { useApp } from "@/context/AppContext"
 import { useProperties } from "@/hooks/useProperties"
+import { SEO } from "@/components/SEO"
 import { Button } from "@/components/ui/button"
 
 export function Favorites() {
@@ -32,6 +33,7 @@ export function Favorites() {
 
   return (
     <div className="space-y-6">
+      <SEO title="My Favorites" description="Your saved student housing listings on CampusLease." url="/favorites" />
       <Breadcrumb items={[{ label: "Favorites" }]} />
       <SectionHeader
         eyebrow="Favorites"

@@ -11,6 +11,7 @@ import type { PropertyFiltersState } from "@/components/properties/PropertyFilte
 import { PropertyCard } from "@/components/properties/PropertyCard"
 import { PropertyGridSkeleton } from "@/components/skeletons/PropertyCardSkeleton"
 import { useProperties } from "@/hooks/useProperties"
+import { SEO } from "@/components/SEO"
 
 const defaultFilters: PropertyFiltersState = {
   query: "",
@@ -536,6 +537,11 @@ export function MapView() {
 
   return (
     <div className="space-y-6">
+      <SEO
+        title="Browse Student Housing Listings"
+        description="Search apartments, houses, and studios near your university. Filter by price, bedrooms, and amenities."
+        url="/map"
+      />
       <Breadcrumb items={[{ label: "Listings" }]} />
 
       {/* Map */}

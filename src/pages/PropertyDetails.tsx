@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { useCreateThread } from "@/hooks/useThreads"
 import { useCreateApplication } from "@/hooks/useApplications"
+import { SEO } from "@/components/SEO"
 
 export function PropertyDetails() {
   const { id } = useParams()
@@ -83,6 +84,12 @@ export function PropertyDetails() {
 
   return (
     <div className="space-y-8">
+      <SEO
+        title={`${property.title} — ${property.city}`}
+        description={`${property.bedrooms} bed, ${property.bathrooms} bath in ${property.city}. $${property.price.toLocaleString()}/mo. ${property.description ?? ""}`.trim()}
+        image={property.images[0]}
+        url={`/properties/${property.id}`}
+      />
       <Breadcrumb items={[{ label: "Browse", href: "/browse" }, { label: property.title }]} />
       <div className="flex items-start justify-between gap-4">
         <SectionHeader
