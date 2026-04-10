@@ -60,8 +60,8 @@ const whyUs = [
   },
   {
     icon: ShieldCheck,
-    title: "Free to Use",
-    desc: "Browse and message for free right now. No hidden fees for students, ever.",
+    title: "Free for Students",
+    desc: "Browsing and messaging is always free for students. Landlords pay a small fee to list.",
   },
 ]
 
@@ -90,7 +90,7 @@ const faqs = [
   },
   {
     q: "Is CampusLease free?",
-    a: "Yes — completely free right now for both students and landlords. A paid tier with premium features is coming later, but browsing and messaging will always be free for students.",
+    a: "Browsing and messaging is always free for students. Landlords pay a fee to post a listing. Early landlords get a discounted rate.",
   },
   {
     q: "How do I list my property?",
@@ -167,7 +167,7 @@ export function Landing() {
                   <Link to="/create">List Your Property</Link>
                 </Button>
               </div>
-              <p className="text-sm text-slate-400">Free to use · No account needed to browse · {listingCount > 0 ? `${listingCount} listing${listingCount !== 1 ? "s" : ""} live` : "Listings live now"}</p>
+              <p className="text-sm text-slate-400">Free to browse · No account needed · {listingCount > 0 ? `${listingCount} listing${listingCount !== 1 ? "s" : ""} live` : "Listings live now"}</p>
             </div>
 
             {/* Right card */}
