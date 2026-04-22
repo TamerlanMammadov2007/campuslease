@@ -203,18 +203,6 @@ export function PropertyDetails() {
             </CardContent>
           </Card>
 
-          {similar.length ? (
-            <div className="space-y-4">
-              <p className="text-lg font-semibold text-white">
-                Recommended Similar Properties
-              </p>
-              <div className="grid gap-4 md:grid-cols-2">
-                {similar.map((item) => (
-                  <PropertyCard key={item.id} property={item} />
-                ))}
-              </div>
-            </div>
-          ) : null}
         </div>
 
         <div className="space-y-6 lg:sticky lg:top-8 lg:self-start">
@@ -289,6 +277,19 @@ export function PropertyDetails() {
           </motion.div>
         </div>
       </div>
+
+      {similar.length ? (
+        <div className="space-y-4">
+          <p className="text-lg font-semibold text-white">
+            Recommended Similar Properties
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {similar.map((item) => (
+              <PropertyCard key={item.id} property={item} />
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
