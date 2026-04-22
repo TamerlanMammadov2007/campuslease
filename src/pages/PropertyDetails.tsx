@@ -109,7 +109,7 @@ export function PropertyDetails() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1.4fr_0.6fr]">
-        <div className="space-y-6">
+        <div className="order-2 space-y-6 lg:order-1">
           <Card className="overflow-hidden border border-white/10 bg-white/10">
             <CardContent className="space-y-4">
               <div className="relative">
@@ -217,7 +217,7 @@ export function PropertyDetails() {
           ) : null}
         </div>
 
-        <div className="space-y-6 lg:sticky lg:top-8 lg:self-start">
+        <div className="order-1 space-y-6 lg:order-2 lg:sticky lg:top-8 lg:self-start">
           <Card className="border border-white/10 bg-white/10">
             <CardContent className="space-y-4">
               <div className="rounded-2xl bg-gradient-to-r from-orange-400 to-amber-300 px-4 py-3 text-sm font-semibold text-slate-900">

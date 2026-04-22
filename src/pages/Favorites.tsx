@@ -24,7 +24,7 @@ export function Favorites() {
           <Heart size={32} />
           <p>No favorites yet.</p>
           <Button asChild>
-            <Link to="/browse">Browse Properties</Link>
+            <Link to="/map">Browse Properties</Link>
           </Button>
         </CardContent>
       </Card>

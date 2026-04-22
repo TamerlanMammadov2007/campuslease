@@ -461,6 +461,7 @@ export function ListingForm({
             <label className="flex h-36 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/20 bg-white/5 text-xs text-slate-300">
               <UploadCloud size={18} />
               {isUploading ? "Uploading photos..." : "Drop photos or click to upload"}
+              <span className="text-xs text-slate-500">JPG, PNG only · Max 5MB each</span>
               <input
                 type="file"
                 accept="image/*"
