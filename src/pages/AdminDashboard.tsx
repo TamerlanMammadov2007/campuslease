@@ -4,6 +4,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { SectionHeader } from "@/components/SectionHeader"
 import {
   useAdminApplications,
@@ -60,6 +61,34 @@ export function AdminDashboard() {
 
   const [userSearch, setUserSearch] = React.useState("")
   const [listingSearch, setListingSearch] = React.useState("")
+  const [emailTo, setEmailTo] = React.useState("")
+  const [emailSubject, setEmailSubject] = React.useState("")
+  const [emailMessage, setEmailMessage] = React.useState("")
+  const [isSendingEmail, setIsSendingEmail] = React.useState(false)
+
+  const handleSendEmail = async () => {
+    if (!emailTo.trim() || !emailSubject.trim() || !emailMessage.trim()) {
+      toast.error("Please fill in all fields.")
+      return
+    }
+    setIsSendingEmail(true)
+    try {
+      const { error } = await supabase.functions.invoke("send-email", {
+        body: { to: emailTo.trim(), subject: emailSubject.trim(), message: emailMessage.trim() },
+      })
+      if (error) throw error
+      toast.success("Email sent.")
+      setEmailTo("")
+      setEmailSubject("")
+      setEmailMessage("")
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to send email."
+      toast.error(message)
+    } finally {
+      setIsSendingEmail(false)
+    }
+  }
+
   const [showAllUsers, setShowAllUsers] = React.useState(false)
   const [showAllListings, setShowAllListings] = React.useState(false)
   const [showAllApplications, setShowAllApplications] = React.useState(false)
@@ -522,6 +551,32 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Send Email */}
+      <Card className="border border-white/10 bg-white/10">
+        <CardContent className="space-y-4">
+          <p className="text-sm font-semibold text-white">Send Email to User</p>
+          <Input
+            placeholder="Recipient email (e.g. hurshs1408@gmail.com)"
+            value={emailTo}
+            onChange={(e) => setEmailTo(e.target.value)}
+          />
+          <Input
+            placeholder="Subject"
+            value={emailSubject}
+            onChange={(e) => setEmailSubject(e.target.value)}
+          />
+          <Textarea
+            placeholder="Message..."
+            value={emailMessage}
+            onChange={(e) => setEmailMessage(e.target.value)}
+            rows={5}
+          />
+          <Button onClick={handleSendEmail} disabled={isSendingEmail}>
+            {isSendingEmail ? "Sending..." : "Send Email"}
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Login events */}
       <Card className="border border-white/10 bg-white/10">

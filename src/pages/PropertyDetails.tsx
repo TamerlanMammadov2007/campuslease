@@ -217,8 +217,8 @@ export function PropertyDetails() {
           ) : null}
         </div>
 
-        <div className="space-y-6">
-          <Card className="sticky top-8 border border-white/10 bg-white/10">
+        <div className="space-y-6 lg:sticky lg:top-8 lg:self-start">
+          <Card className="border border-white/10 bg-white/10">
             <CardContent className="space-y-4">
               <div className="rounded-2xl bg-gradient-to-r from-orange-400 to-amber-300 px-4 py-3 text-sm font-semibold text-slate-900">
                 ${property.price}/month
