@@ -9,7 +9,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-indigo-950">
-      <div className="mx-auto flex min-h-screen max-w-[1600px] flex-col overflow-hidden lg:flex-row">
+      <div className="mx-auto flex min-h-screen max-w-[1600px] flex-col lg:flex-row">
         <MobileHeader open={open} onToggle={() => setOpen((prev) => !prev)} />
         <div
           className={cn(

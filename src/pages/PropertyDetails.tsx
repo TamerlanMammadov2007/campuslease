@@ -108,7 +108,7 @@ export function PropertyDetails() {
         </button>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[1.4fr_0.6fr]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.6fr)]">
         <div className="order-2 space-y-6 lg:order-1">
           <Card className="overflow-hidden border border-white/10 bg-white/10">
             <CardContent className="space-y-4">
