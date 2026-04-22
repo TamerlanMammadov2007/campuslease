@@ -103,6 +103,14 @@ export function ListingForm({
       event.target.value = ""
       return
     }
+    const invalidFiles = Array.from(files).filter(
+      (file) => file.type === "image/heic" || file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif"),
+    )
+    if (invalidFiles.length > 0) {
+      toast.error("HEIC/HEIF photos are not supported. Please upload JPG or PNG files. On iPhone: Settings → Camera → Formats → Most Compatible.")
+      event.target.value = ""
+      return
+    }
     setIsUploading(true)
     try {
       const urls = await Promise.all(
