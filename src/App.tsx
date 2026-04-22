@@ -21,6 +21,7 @@ import { ResetPassword } from "@/pages/ResetPassword"
 import { AdminLogin } from "@/pages/AdminLogin"
 import { AdminDashboard } from "@/pages/AdminDashboard"
 import { RequireAdmin } from "@/components/auth/RequireAdmin"
+import { CityPage } from "@/pages/CityPage"
 import { NotFound } from "@/pages/NotFound"
 
 function App() {
@@ -138,6 +139,7 @@ function App() {
             </RequireAuth>
           }
         />
+        <Route path="/cities/:city" element={<CityPage />} />
         <Route
           path="*"
           element={
