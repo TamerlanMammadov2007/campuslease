@@ -116,7 +116,7 @@ export function PropertyDetails() {
                 <img
                   src={images[activeImage]}
                   alt={property.title}
-                  className="h-80 w-full rounded-2xl object-cover"
+                  className="h-56 w-full rounded-2xl object-cover md:h-80"
                 />
                 {images.length > 1 && (
                   <>

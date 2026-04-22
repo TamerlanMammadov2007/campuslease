@@ -68,7 +68,7 @@ export function Browse() {
   return (
     <div className="space-y-8">
       <Breadcrumb items={[{ label: "Browse" }]} />
-      <div className="rounded-3xl bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 p-8 text-white shadow-xl">
+      <div className="rounded-3xl bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 p-5 text-white shadow-xl md:p-8">
         <SectionHeader
           eyebrow="Student Housing"
           title="Student Housing Made Easy"

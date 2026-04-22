@@ -107,8 +107,8 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
           </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-6 pt-1">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-6 pt-1">
+          <div className="col-span-2 lg:col-span-2">
             <Input
               placeholder="Search by city or address"
               value={value.query}
@@ -117,7 +117,7 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
               }
             />
           </div>
-          <div className="relative">
+          <div className="relative col-span-2 lg:col-span-1">
             <GraduationCap size={14} className="absolute left-3 top-3 text-slate-400" />
             <Input
               className="pl-9"
@@ -137,7 +137,7 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
                 onChange({ ...value, type: event.target.value })
               }
             >
-              <option value="">Property Type</option>
+              <option value="">Type</option>
               <option value="Apartment">Apartment</option>
               <option value="Loft">Loft</option>
               <option value="Duplex">Duplex</option>
@@ -159,13 +159,13 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
                 onChange({ ...value, bedrooms: event.target.value })
               }
             >
-              <option value="">Bedrooms</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
+              <option value="">Beds</option>
+              <option value="1">1+</option>
+              <option value="2">2+</option>
+              <option value="3">3+</option>
+              <option value="4">4+</option>
+              <option value="5">5+</option>
+              <option value="6">6+</option>
             </select>
           </div>
           <div className="relative">
@@ -177,13 +177,13 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
                 onChange({ ...value, bathrooms: event.target.value })
               }
             >
-              <option value="">Bathrooms</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
+              <option value="">Baths</option>
+              <option value="1">1+</option>
+              <option value="2">2+</option>
+              <option value="3">3+</option>
+              <option value="4">4+</option>
+              <option value="5">5+</option>
+              <option value="6">6+</option>
             </select>
           </div>
         </div>

@@ -141,7 +141,7 @@ export function Landing() {
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-indigo-950 text-white">
 
         {/* ── Hero ── */}
-        <section className="mx-auto max-w-6xl px-6 py-20">
+        <section className="mx-auto max-w-6xl px-6 py-12 lg:py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -152,7 +152,7 @@ export function Landing() {
               <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/40 bg-orange-400/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-orange-200">
                 <Sparkles size={14} /> CampusLease — Live Now
               </div>
-              <h1 className="text-5xl font-bold leading-tight md:text-6xl">
+              <h1 className="text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
                 Student Housing,<br />
                 <span className="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">Built for Campus.</span>
               </h1>
