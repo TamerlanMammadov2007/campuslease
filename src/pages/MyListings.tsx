@@ -7,16 +7,14 @@ import { SectionHeader } from "@/components/SectionHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { useDeleteListing, useProperties } from "@/hooks/useProperties"
+import { useDeleteListing, useMarkAsLeased, useOwnerListings } from "@/hooks/useProperties"
 import { useApp } from "@/context/AppContext"
 
 export function MyListings() {
-  const { data: listings = [], isLoading } = useProperties()
-  const { mutateAsync: deleteListing } = useDeleteListing()
   const { currentUserId } = useApp()
-  const ownedListings = listings.filter(
-    (listing) => listing.ownerId === currentUserId,
-  )
+  const { data: ownedListings = [], isLoading } = useOwnerListings(currentUserId)
+  const { mutateAsync: deleteListing } = useDeleteListing()
+  const { mutateAsync: markAsLeased } = useMarkAsLeased()
 
   return (
     <div className="space-y-6">
@@ -80,6 +78,25 @@ export function MyListings() {
                   <Button asChild size="sm" variant="ghost">
                     <Link to={`/listings/${listing.id}/edit`}>Edit</Link>
                   </Button>
+                  {listing.status !== "leased" && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-emerald-400 hover:text-emerald-300"
+                      onClick={async () => {
+                        const confirmed = window.confirm("Mark this listing as leased? It will be removed from browse.")
+                        if (!confirmed) return
+                        try {
+                          await markAsLeased(listing.id)
+                          toast.success("Listing marked as leased.")
+                        } catch {
+                          toast.error("Failed to update listing.")
+                        }
+                      }}
+                    >
+                      Mark as Leased
+                    </Button>
+                  )}
                   <Button
                     size="sm"
                     variant="ghost"

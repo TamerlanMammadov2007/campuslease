@@ -94,7 +94,7 @@ export function useProperties() {
   return useQuery<Property[]>({
     queryKey: ["properties"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("listings").select("*").order("created_at", { ascending: false })
+      const { data, error } = await supabase.from("listings").select("*").neq("status", "leased").order("created_at", { ascending: false })
       if (error) throw error
       return (data ?? []).map((row) => mapListing(row as ListingRow))
     },
@@ -164,6 +164,34 @@ export function useUpdateListing() {
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: ["properties"] })
       queryClient.setQueryData(["property", updated.id], updated)
+    },
+  })
+}
+
+export function useOwnerListings(ownerId?: string) {
+  return useQuery<Property[]>({
+    queryKey: ["owner-listings", ownerId],
+    queryFn: async () => {
+      if (!ownerId) return []
+      const { data, error } = await supabase.from("listings").select("*").eq("owner_id", ownerId).order("created_at", { ascending: false })
+      if (error) throw error
+      return (data ?? []).map((row) => mapListing(row as ListingRow))
+    },
+    enabled: Boolean(ownerId),
+  })
+}
+
+export function useMarkAsLeased() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("listings").update({ status: "leased" }).eq("id", id)
+      if (error) throw error
+    },
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["properties"] })
+      queryClient.invalidateQueries({ queryKey: ["owner-listings"] })
+      queryClient.invalidateQueries({ queryKey: ["property", id] })
     },
   })
 }
