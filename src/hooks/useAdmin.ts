@@ -27,6 +27,8 @@ type AdminApplication = {
   id: string
   listing_id: string
   listing_title?: string
+  owner_email?: string
+  owner_name?: string
   name: string
   email: string
   phone?: string
@@ -125,20 +127,25 @@ export function useAdminApplications() {
     queryFn: async (): Promise<AdminApplication[]> => {
       const { data, error } = await supabase
         .from("applications")
-        .select("id,listing_id,applicant_name,applicant_email,applicant_phone,message,created_at,listings(title)")
+        .select("id,listing_id,applicant_name,applicant_email,applicant_phone,message,created_at,listings(title,owner_name,owner_email)")
         .order("created_at", { ascending: false })
       if (error) throw error
-      return (data ?? []).map((row) => ({
-        id: row.id,
-        listing_id: row.listing_id,
-        listing_title: Array.isArray(row.listings) ? row.listings[0]?.title : (row.listings as any)?.title,
-        name: row.applicant_name,
-        email: row.applicant_email,
-        phone: row.applicant_phone ?? undefined,
-        message: row.message ?? undefined,
-        applicant_user_id: undefined,
-        created_at: row.created_at,
-      }))
+      return (data ?? []).map((row) => {
+        const listing = Array.isArray(row.listings) ? row.listings[0] : (row.listings as any)
+        return {
+          id: row.id,
+          listing_id: row.listing_id,
+          listing_title: listing?.title,
+          owner_email: listing?.owner_email,
+          owner_name: listing?.owner_name,
+          name: row.applicant_name,
+          email: row.applicant_email,
+          phone: row.applicant_phone ?? undefined,
+          message: row.message ?? undefined,
+          applicant_user_id: undefined,
+          created_at: row.created_at,
+        }
+      })
     },
   })
 }

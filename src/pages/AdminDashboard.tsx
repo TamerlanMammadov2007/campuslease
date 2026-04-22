@@ -519,6 +519,19 @@ export function AdminDashboard() {
                 <p className="mt-1 text-xs text-slate-500">
                   {new Date(application.created_at).toLocaleDateString()}
                 </p>
+                {application.owner_email && (
+                  <button
+                    className="mt-2 text-xs text-orange-300 hover:text-orange-200"
+                    onClick={() => {
+                      setEmailTo(application.owner_email ?? "")
+                      setEmailSubject(`You received a message about ${application.listing_title ?? "your listing"}`)
+                      setEmailMessage(`Hi ${application.owner_name ?? "there"},\n\nYou have a new message from ${application.name} about your listing "${application.listing_title ?? ""}" on CampusLease. Log in to your inbox to reply.\n\nThe CampusLease Team`)
+                      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
+                    }}
+                  >
+                    Notify owner →
+                  </button>
+                )}
               </div>
             ))}
             {applications.length > 6 && (
