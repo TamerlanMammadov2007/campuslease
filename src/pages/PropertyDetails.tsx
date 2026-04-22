@@ -83,7 +83,7 @@ export function PropertyDetails() {
         ]
 
   return (
-    <div className="space-y-8">
+    <div className="w-full max-w-full overflow-hidden space-y-6">
       <SEO
         title={`${property.title} — ${property.city}`}
         description={`${property.bedrooms} bed, ${property.bathrooms} bath in ${property.city}. $${property.price.toLocaleString()}/mo. ${property.description ?? ""}`.trim()}
@@ -91,24 +91,27 @@ export function PropertyDetails() {
         url={`/properties/${property.id}`}
       />
       <Breadcrumb items={[{ label: "Browse", href: "/browse" }, { label: property.title }]} />
-      <div className="flex items-start justify-between gap-4">
-        <SectionHeader
-          eyebrow="Property Details"
-          title={property.title}
-          subtitle={`${property.address}, ${property.city}`}
-        />
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <SectionHeader
+            eyebrow="Property Details"
+            title={property.title}
+            subtitle={`${property.address}, ${property.city}`}
+          />
+        </div>
         <button
           onClick={() => {
             void navigator.clipboard.writeText(window.location.href)
             toast.success("Link copied to clipboard!")
           }}
-          className="mt-1 flex shrink-0 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-slate-300 hover:bg-white/10"
+          className="mt-1 flex shrink-0 items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-2.5 py-2 text-sm text-slate-300 hover:bg-white/10"
         >
-          <Share2 size={15} /> Share
+          <Share2 size={15} />
+          <span className="hidden sm:inline">Share</span>
         </button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.6fr)]">
+      <div className="grid w-full gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.6fr)]">
         <div className="space-y-6">
           <Card className="overflow-hidden border border-white/10 bg-white/10">
             <CardContent className="space-y-4">
@@ -170,7 +173,7 @@ export function PropertyDetails() {
                   {property.description}
                 </p>
               </div>
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
                     Amenities
@@ -205,7 +208,7 @@ export function PropertyDetails() {
 
         </div>
 
-        <div className="space-y-6 lg:sticky lg:top-8 lg:self-start">
+        <div className="w-full space-y-6 lg:sticky lg:top-8 lg:self-start">
           <Card className="border border-white/10 bg-white/10">
             <CardContent className="space-y-4">
               <div className="rounded-2xl bg-gradient-to-r from-orange-400 to-amber-300 px-4 py-3 text-sm font-semibold text-slate-900">
