@@ -9,7 +9,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-indigo-950">
-      <div className="mx-auto flex min-h-screen max-w-[1600px] flex-col lg:flex-row">
+      <div className="mx-auto flex min-h-screen max-w-[1600px] flex-col overflow-hidden lg:flex-row">
         <MobileHeader open={open} onToggle={() => setOpen((prev) => !prev)} />
         <div
           className={cn(
@@ -26,7 +26,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         >
           <Sidebar onNavigate={() => setOpen(false)} />
         </div>
-        <main className="min-w-0 flex-1 overflow-hidden px-4 pb-16 pt-8 md:px-6 lg:px-10 lg:pt-12 2xl:px-12">
+        <main className="min-w-0 flex-1 px-4 pb-16 pt-8 md:px-6 lg:px-10 lg:pt-12 2xl:px-12">
           {children}
         </main>
       </div>
