@@ -26,7 +26,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         >
           <Sidebar onNavigate={() => setOpen(false)} />
         </div>
-        <main className="min-w-0 flex-1 px-4 pb-16 pt-6 md:px-6 md:pt-8 lg:px-10 lg:pt-12 2xl:px-12">
+        <main className="min-w-0 flex-1 overflow-x-hidden px-4 pb-16 pt-6 md:px-6 md:pt-8 lg:px-10 lg:pt-12 2xl:px-12">
           {children}
         </main>
       </div>

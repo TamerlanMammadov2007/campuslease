@@ -121,8 +121,8 @@ export function PropertyDetails() {
         </button>
       </div>
 
-      <div className="grid w-full gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.6fr)]">
-        <div className="space-y-6">
+      <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.6fr)]">
+        <div className="min-w-0 space-y-6">
           <Card className="overflow-hidden border border-white/10 bg-white/10">
             <CardContent className="space-y-4">
               <div className="relative">
@@ -226,7 +226,7 @@ export function PropertyDetails() {
 
         </div>
 
-        <div className="w-full space-y-6 lg:sticky lg:top-8 lg:self-start">
+        <div className="w-full min-w-0 space-y-6 lg:sticky lg:top-8 lg:self-start">
           <Card className="border border-white/10 bg-white/10">
             <CardContent className="space-y-4">
               <div className="rounded-2xl bg-gradient-to-r from-orange-400 to-amber-300 px-4 py-3 text-sm font-semibold text-slate-900">
@@ -279,15 +279,15 @@ export function PropertyDetails() {
           <Card className="overflow-hidden border border-white/10">
             <iframe
               title="Property location"
-              width="100%"
               height="200"
               style={{ border: 0 }}
               loading="lazy"
               allowFullScreen
               src={`https://maps.google.com/maps?q=${encodeURIComponent(`${property.address}, ${property.city}`)}&output=embed&z=15`}
+              className="block w-full max-w-full"
             />
             <CardContent className="py-3">
-              <p className="text-xs text-slate-400">{property.address}, {property.city}</p>
+              <p className="break-words text-xs text-slate-400">{property.address}, {property.city}</p>
             </CardContent>
           </Card>
 
