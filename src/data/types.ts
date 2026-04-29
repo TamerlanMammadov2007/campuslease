@@ -34,33 +34,6 @@ export type Property = {
   createdDate: string
 }
 
-export type RoommateProfile = {
-  id: string
-  userId?: string
-  name: string
-  age: number
-  gender: string
-  university: string
-  major: string
-  bio: string
-  photo?: string
-  budgetMin: number
-  budgetMax: number
-  moveInDate: string
-  preferredLocations: string[]
-  sleepSchedule: "Early Bird" | "Night Owl" | "Flexible"
-  cleanliness: "Very Clean" | "Moderately Clean" | "Relaxed"
-  noise: "Quiet" | "Moderate" | "Lively"
-  guests: "Rarely" | "Sometimes" | "Often"
-  smoking: "No" | "Yes"
-  drinking: "No" | "Yes" | "Sometimes"
-  pets: "No Pets" | "Has Pets" | "Open to Pets"
-  studyHabits: "Focused" | "Balanced" | "Flexible"
-  socialLevel: "Low-key" | "Social" | "Very Social"
-  interests: string[]
-  compatibilityScore?: number
-}
-
 export type Message = {
   id: string
   threadId: string

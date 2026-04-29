@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useApp } from "@/context/AppContext"
 import { useProperties } from "@/hooks/useProperties"
 import type { Property } from "@/data/types"
+import { handlePropertyImageError } from "@/lib/utils"
 
 export function Compare() {
   const { compareIds } = useApp()
@@ -65,6 +66,7 @@ export function Compare() {
                         "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop"
                       }
                       alt={property.title}
+                      onError={handlePropertyImageError}
                       className="h-16 w-full rounded-2xl object-cover"
                     />
                     <Link
@@ -96,7 +98,7 @@ export function Compare() {
         </table>
       </div>
       <Button asChild variant="outline">
-        <Link to="/browse">Back to Browse</Link>
+        <Link to="/map">Back to Listings</Link>
       </Button>
     </div>
   )

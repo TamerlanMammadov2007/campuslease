@@ -45,7 +45,7 @@ export function Inbox() {
         <CardContent className="flex flex-col items-center gap-3 py-12 text-center text-slate-200">
           <MessageSquare size={32} />
           <p>No conversations yet.</p>
-          <Link className="text-orange-200" to="/browse">
+          <Link className="text-orange-200" to="/map">
             Start messaging property owners
           </Link>
         </CardContent>
@@ -60,10 +60,16 @@ export function Inbox() {
       <SectionHeader
         eyebrow="Inbox"
         title="Messages"
-        subtitle="Stay on top of property tours and roommate conversations."
+        subtitle="Stay on top of property tours and tenant conversations."
       />
       <div className="space-y-4">
-        {threads.map((thread) => {
+        {[...threads]
+          .sort((a, b) => {
+            const aTime = a.messages[a.messages.length - 1]?.createdAt ?? ""
+            const bTime = b.messages[b.messages.length - 1]?.createdAt ?? ""
+            return new Date(bTime).getTime() - new Date(aTime).getTime()
+          })
+          .map((thread) => {
           const lastMessage = thread.messages[thread.messages.length - 1]
           const unread = thread.messages.filter((message) => !message.read)
             .length
@@ -85,7 +91,7 @@ export function Inbox() {
                             <Building2 size={12} /> {thread.propertyTitle}
                           </span>
                         ) : (
-                          "Roommate conversation"
+                          "Direct conversation"
                         )}
                       </p>
                       <p className="text-xs text-slate-400">

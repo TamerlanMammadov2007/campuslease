@@ -123,11 +123,9 @@ export function Profile() {
             onClick={async () => {
               const confirmed = window.confirm("Are you sure you want to delete your account? This cannot be undone.")
               if (!confirmed) return
-              const { error } = await supabase.auth.signOut()
-              if (!error) {
-                await supabase.from("profiles").delete().eq("id", currentUserId)
-                window.location.href = "/"
-              }
+              await supabase.from("profiles").delete().eq("id", currentUserId)
+              await supabase.auth.signOut()
+              window.location.href = "/"
             }}
           >
             Delete Account

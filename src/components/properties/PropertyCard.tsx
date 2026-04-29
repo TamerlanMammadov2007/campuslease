@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useApp } from "@/context/AppContext"
 import type { Property } from "@/data/types"
-import { cn } from "@/lib/utils"
+import { cn, handlePropertyImageError } from "@/lib/utils"
 
 type PropertyCardProps = {
   property: Property
@@ -38,6 +38,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop"
           }
           alt={property.title}
+          onError={handlePropertyImageError}
           className="h-48 w-full object-cover"
           loading="lazy"
         />

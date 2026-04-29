@@ -16,7 +16,7 @@ createRoot(document.getElementById("root")!).render(
       <QueryClientProvider client={queryClient}>
         <AppProvider>
           <App />
-          <Toaster richColors position="top-right" />
+          <Toaster richColors position="top-center" />
         </AppProvider>
       </QueryClientProvider>
     </HelmetProvider>

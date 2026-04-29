@@ -88,7 +88,7 @@ export function Conversation() {
       <SectionHeader
         eyebrow="Conversation"
         title={thread.participantName}
-        subtitle={thread.propertyTitle ?? "Roommate thread"}
+        subtitle={thread.propertyTitle ?? "Direct thread"}
       />
       <Card className="border border-white/10 bg-white/10">
         <CardContent className="flex h-[500px] flex-col">

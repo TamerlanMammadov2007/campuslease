@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { SEO } from "@/components/SEO"
 import { useProperties } from "@/hooks/useProperties"
+import { handlePropertyImageError } from "@/lib/utils"
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -187,6 +188,7 @@ export function Landing() {
                       <img
                         src={featured.images[0] ?? "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop"}
                         alt={featured.title}
+                        onError={handlePropertyImageError}
                         className="h-44 w-full rounded-xl object-cover"
                       />
                       <div className="flex items-center justify-between">

@@ -9,7 +9,6 @@ type AdminStats = {
   applications: number
   threads: number
   messages: number
-  roommateProfiles: number
   newUsersThisWeek: number
   availableListings: number
   pendingListings: number
@@ -56,7 +55,6 @@ export function useAdminStats() {
         applications,
         threads,
         messages,
-        roommateProfiles,
         newUsers,
         availableListings,
         pendingListings,
@@ -67,7 +65,6 @@ export function useAdminStats() {
         supabase.from("applications").select("id", { count: "exact", head: true }),
         supabase.from("threads").select("id", { count: "exact", head: true }),
         supabase.from("messages").select("id", { count: "exact", head: true }),
-        supabase.from("roommate_profiles").select("id", { count: "exact", head: true }),
         supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", oneWeekAgo),
         supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "available"),
         supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "pending"),
@@ -86,7 +83,6 @@ export function useAdminStats() {
         applications: applications.count ?? 0,
         threads: threads.count ?? 0,
         messages: messages.count ?? 0,
-        roommateProfiles: roommateProfiles.count ?? 0,
         newUsersThisWeek: newUsers.count ?? 0,
         availableListings: availableListings.count ?? 0,
         pendingListings: pendingListings.count ?? 0,

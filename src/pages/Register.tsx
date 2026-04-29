@@ -20,7 +20,7 @@ export function Register() {
   React.useEffect(() => {
     if (awaitingConfirmation) return
     if (!authLoading && isAuthenticated) {
-      navigate("/browse")
+      navigate("/map")
     }
   }, [authLoading, isAuthenticated, navigate, awaitingConfirmation])
 
@@ -35,7 +35,7 @@ export function Register() {
         toast.success("Check your email to confirm your account before logging in.")
       } else {
         toast.success("Account created.")
-        navigate("/browse")
+        navigate("/map")
       }
     } catch (error) {
       const message =

@@ -47,8 +47,8 @@ const amenityOptions = [
 
 export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
   const [advancedOpen, setAdvancedOpen] = useState(false)
-  const minRange = 500
-  const maxRange = 3000
+  const minRange = 0
+  const maxRange = 8000
 
   const toggleAmenity = (amenity: string) => {
     onChange({
@@ -92,8 +92,8 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
                   type: "",
                   bedrooms: "",
                   bathrooms: "",
-                  minPrice: 800,
-                  maxPrice: 2500,
+                  minPrice: 0,
+                  maxPrice: 8000,
                   furnished: false,
                   pets: false,
                   parking: false,
@@ -110,7 +110,7 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-6 pt-1">
           <div className="col-span-2 lg:col-span-2">
             <Input
-              placeholder="Search by city or address"
+              placeholder="Search by title, city, or address"
               value={value.query}
               onChange={(event) =>
                 onChange({ ...value, query: event.target.value })
@@ -139,12 +139,9 @@ export function PropertyFilters({ value, onChange }: PropertyFiltersProps) {
             >
               <option value="">Type</option>
               <option value="Apartment">Apartment</option>
-              <option value="Loft">Loft</option>
-              <option value="Duplex">Duplex</option>
               <option value="House">House</option>
               <option value="Studio">Studio</option>
               <option value="Townhome">Townhome</option>
-              <option value="Condo">Condo</option>
             </select>
           </div>
           <div className="relative">

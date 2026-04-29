@@ -19,7 +19,7 @@ export function Login() {
 
   React.useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      navigate("/browse")
+      navigate("/map")
     }
   }, [authLoading, isAuthenticated, navigate])
 

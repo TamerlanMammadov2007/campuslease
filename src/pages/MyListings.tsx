@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useDeleteListing, useMarkAsLeased, useOwnerListings } from "@/hooks/useProperties"
 import { useApp } from "@/context/AppContext"
+import { handlePropertyImageError } from "@/lib/utils"
 
 export function MyListings() {
   const { currentUserId } = useApp()
@@ -41,6 +42,7 @@ export function MyListings() {
                 <img
                   src={listing.images[0] ?? "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop"}
                   alt={listing.title}
+                  onError={handlePropertyImageError}
                   className="h-44 w-full object-cover"
                 />
                 <Badge
@@ -101,6 +103,8 @@ export function MyListings() {
                     size="sm"
                     variant="ghost"
                     onClick={async () => {
+                      const confirmed = window.confirm("Are you sure you want to delete this listing? This cannot be undone.")
+                      if (!confirmed) return
                       try {
                         await deleteListing(listing.id)
                         toast.success("Listing deleted.")

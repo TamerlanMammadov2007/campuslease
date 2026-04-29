@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { useApp } from "@/context/AppContext"
 import type { Property } from "@/data/types"
+import { handlePropertyImageError } from "@/lib/utils"
 
 type CompareBarProps = {
   properties: Property[]
@@ -34,6 +35,7 @@ export function CompareBar({ properties }: CompareBarProps) {
                   "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop"
                 }
                 alt={property.title}
+                onError={handlePropertyImageError}
                 className="h-full w-full object-cover"
               />
             </div>

@@ -128,7 +128,6 @@ export function AdminDashboard() {
       { label: "Applications", value: stats?.applications ?? 0 },
       { label: "Threads", value: stats?.threads ?? 0 },
       { label: "Messages", value: stats?.messages ?? 0 },
-      { label: "Roommate Profiles", value: stats?.roommateProfiles ?? 0 },
     ],
     [stats],
   )
@@ -162,8 +161,9 @@ export function AdminDashboard() {
 
   const handleLogout = async () => {
     try {
+      const { data } = await supabase.auth.getUser()
       await supabase.from("admin_login_events").insert({
-        user_id: null,
+        user_id: data.user?.id ?? null,
         email: adminEmail,
         event_type: "logout",
       })
@@ -267,7 +267,7 @@ export function AdminDashboard() {
       </div>
 
       {/* Main stats */}
-      <div className="grid gap-4 md:grid-cols-4 xl:grid-cols-7">
+      <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
         {summaryCards.map((card) => (
           <Card key={card.label} className="border border-white/10 bg-white/10">
             <CardContent className="space-y-1">
@@ -552,7 +552,7 @@ export function AdminDashboard() {
               <div key={thread.id} className="rounded-2xl border border-white/10 p-3 text-sm text-slate-200">
                 <p className="font-semibold">{thread.participantName}</p>
                 <p className="text-xs text-slate-400">
-                  {thread.propertyTitle ?? "Roommate thread"}
+                  {thread.propertyTitle ?? "Direct thread"}
                 </p>
               </div>
             ))}

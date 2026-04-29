@@ -18,10 +18,11 @@ import { toast } from "sonner"
 import { useCreateThread } from "@/hooks/useThreads"
 import { useCreateApplication } from "@/hooks/useApplications"
 import { SEO } from "@/components/SEO"
+import { handlePropertyImageError } from "@/lib/utils"
 
 export function PropertyDetails() {
   const { id } = useParams()
-  const { data: property } = useProperty(id)
+  const { data: property, isLoading } = useProperty(id)
   const { data: properties = [] } = useProperties()
   const { isAuthenticated } = useApp()
   const navigate = useNavigate()
@@ -31,8 +32,17 @@ export function PropertyDetails() {
   const [message, setMessage] = React.useState("")
   const [isSending, setIsSending] = React.useState(false)
 
-  if (!property) {
+  if (isLoading) {
     return <PropertyDetailSkeleton />
+  }
+
+  if (!property) {
+    return (
+      <div className="py-16 text-center">
+        <p className="text-lg font-semibold text-white">Property not found.</p>
+        <p className="mt-2 text-sm text-slate-400">This listing may have been removed.</p>
+      </div>
+    )
   }
 
   const similar = properties
@@ -90,7 +100,7 @@ export function PropertyDetails() {
         image={property.images[0]}
         url={`/properties/${property.id}`}
       />
-      <Breadcrumb items={[{ label: "Browse", href: "/browse" }, { label: property.title }]} />
+      <Breadcrumb items={[{ label: "Listings", href: "/map" }, { label: property.title }]} />
       <div className="flex min-w-0 items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <SectionHeader
@@ -119,6 +129,7 @@ export function PropertyDetails() {
                 <img
                   src={images[activeImage]}
                   alt={property.title}
+                  onError={handlePropertyImageError}
                   className="h-56 w-full rounded-2xl object-cover md:h-80"
                 />
                 {images.length > 1 && (
@@ -155,6 +166,7 @@ export function PropertyDetails() {
                     <img
                       src={image}
                       alt={`${property.title} ${index + 1}`}
+                      onError={handlePropertyImageError}
                       className="h-full w-full object-cover"
                     />
                   </button>
@@ -178,14 +190,20 @@ export function PropertyDetails() {
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
                     Amenities
                   </p>
-                  <ul className="mt-3 space-y-2 text-sm text-slate-200">
-                    {property.amenities.map((amenity) => (
-                      <li key={amenity} className="flex items-center gap-2">
-                        <CheckCircle2 size={16} className="text-emerald-300" />
-                        {amenity}
-                      </li>
-                    ))}
-                  </ul>
+                  {property.amenities.length > 0 ? (
+                    <ul className="mt-3 space-y-2 text-sm text-slate-200">
+                      {property.amenities.map((amenity) => (
+                        <li key={amenity} className="flex items-center gap-2">
+                          <CheckCircle2 size={16} className="text-emerald-300" />
+                          {amenity}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-3 text-sm text-slate-400">
+                      No amenities listed.
+                    </p>
+                  )}
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
@@ -221,20 +239,24 @@ export function PropertyDetails() {
                 </p>
               </div>
               <div className="space-y-2 text-sm text-slate-200">
-                <a
-                  href={`mailto:${property.owner.email}`}
-                  className="flex items-center gap-2 hover:text-orange-200"
-                >
-                  <Mail size={14} />
-                  {property.owner.email}
-                </a>
-                <a
-                  href={`tel:${property.owner.phone}`}
-                  className="flex items-center gap-2 hover:text-orange-200"
-                >
-                  <Phone size={14} />
-                  {property.owner.phone}
-                </a>
+                {property.owner.email && (
+                  <a
+                    href={`mailto:${property.owner.email}`}
+                    className="flex items-center gap-2 hover:text-orange-200"
+                  >
+                    <Mail size={14} />
+                    {property.owner.email}
+                  </a>
+                )}
+                {property.owner.phone && (
+                  <a
+                    href={`tel:${property.owner.phone}`}
+                    className="flex items-center gap-2 hover:text-orange-200"
+                  >
+                    <Phone size={14} />
+                    {property.owner.phone}
+                  </a>
+                )}
               </div>
               <div className="space-y-3">
                 <Input

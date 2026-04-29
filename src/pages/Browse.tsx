@@ -17,8 +17,8 @@ const defaultFilters: PropertyFiltersState = {
   type: "",
   bedrooms: "",
   bathrooms: "",
-  minPrice: 800,
-  maxPrice: 2500,
+  minPrice: 0,
+  maxPrice: 8000,
   furnished: false,
   pets: false,
   parking: false,
@@ -32,7 +32,7 @@ export function Browse() {
   const filtered = properties.filter((property) => {
     if (
       filters.query &&
-      !`${property.address} ${property.city}`
+      !`${property.title} ${property.address} ${property.city}`
         .toLowerCase()
         .includes(filters.query.toLowerCase())
     ) {

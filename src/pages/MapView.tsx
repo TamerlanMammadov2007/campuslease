@@ -12,6 +12,7 @@ import { PropertyCard } from "@/components/properties/PropertyCard"
 import { PropertyGridSkeleton } from "@/components/skeletons/PropertyCardSkeleton"
 import { useProperties } from "@/hooks/useProperties"
 import { SEO } from "@/components/SEO"
+import { handlePropertyImageError } from "@/lib/utils"
 
 const defaultFilters: PropertyFiltersState = {
   query: "",
@@ -19,8 +20,8 @@ const defaultFilters: PropertyFiltersState = {
   type: "",
   bedrooms: "",
   bathrooms: "",
-  minPrice: 500,
-  maxPrice: 3000,
+  minPrice: 0,
+  maxPrice: 8000,
   furnished: false,
   pets: false,
   parking: false,
@@ -316,6 +317,128 @@ function findUniversityCoords(query: string) {
   return null
 }
 
+type MapDisplayProps = {
+  height: string
+  apiKey: string | undefined
+  loadError: Error | undefined
+  isLoaded: boolean
+  mapCenter: { lat: number; lng: number }
+  filtered: import("@/data/types").Property[]
+  selectedId: string | null
+  showFullMap: boolean
+  selected: import("@/data/types").Property | undefined
+  mapRef: React.MutableRefObject<google.maps.Map | null>
+  onSelectId: (id: string | null) => void
+  onShowFullMap: (show: boolean) => void
+}
+
+function MapDisplay({
+  height,
+  apiKey,
+  loadError,
+  isLoaded,
+  mapCenter,
+  filtered,
+  selectedId,
+  showFullMap,
+  selected,
+  mapRef,
+  onSelectId,
+  onShowFullMap,
+}: MapDisplayProps) {
+  return (
+    <div className={`overflow-hidden rounded-2xl border border-white/10 ${height}`}>
+      {!apiKey ? (
+        <div className="flex h-full items-center justify-center text-sm text-slate-400">
+          Google Maps API key required.
+        </div>
+      ) : loadError ? (
+        <div className="flex h-full items-center justify-center text-sm text-red-300">
+          Failed to load map.
+        </div>
+      ) : !isLoaded ? (
+        <div className="flex h-full items-center justify-center text-sm text-slate-400">
+          Loading map...
+        </div>
+      ) : (
+        <GoogleMap
+          center={mapCenter}
+          zoom={12}
+          mapContainerClassName="h-full w-full"
+          onLoad={(map) => { mapRef.current = map }}
+          options={{
+            clickableIcons: false,
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: false,
+          }}
+        >
+          {filtered.map((property) => (
+            <OverlayView
+              key={property.id}
+              position={property.coordinates}
+              mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+            >
+              <button
+                onClick={() => {
+                  onSelectId(selectedId === property.id ? null : property.id)
+                  if (!showFullMap) onShowFullMap(true)
+                }}
+                style={{ transform: "translate(-50%, -100%)", whiteSpace: "nowrap" }}
+                className={`rounded-lg px-2.5 py-1 text-xs font-bold shadow-lg transition-transform hover:scale-105 ${
+                  selectedId === property.id
+                    ? "bg-orange-400 text-slate-900"
+                    : "bg-slate-900 text-white"
+                }`}
+              >
+                ${property.price.toLocaleString()}/mo
+              </button>
+            </OverlayView>
+          ))}
+          {selected && showFullMap ? (
+            <InfoWindow
+              position={selected.coordinates}
+              onCloseClick={() => onSelectId(null)}
+              options={{ pixelOffset: new (window as any).google.maps.Size(0, -40) }}
+            >
+              <div className="w-56 overflow-hidden rounded-xl">
+                <img
+                  src={selected.images[0] ?? defaultImage}
+                  alt={selected.title}
+                  onError={handlePropertyImageError}
+                  className="h-32 w-full object-cover"
+                />
+                <div className="space-y-1.5 p-3">
+                  <p className="text-sm font-semibold leading-tight text-slate-900">
+                    {selected.title}
+                  </p>
+                  <p className="text-sm font-bold text-slate-900">
+                    ${selected.price.toLocaleString()}/mo
+                  </p>
+                  <div className="flex gap-3 text-xs text-slate-600">
+                    <span className="flex items-center gap-1">
+                      <Bed size={12} /> {selected.bedrooms} Bed
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Bath size={12} /> {selected.bathrooms} Bath
+                    </span>
+                  </div>
+                  <Link
+                    to={`/properties/${selected.id}`}
+                    className="mt-2 block rounded-lg bg-slate-900 px-3 py-1.5 text-center text-xs font-semibold text-white hover:bg-slate-700"
+                  >
+                    View Details →
+                  </Link>
+                </div>
+              </div>
+            </InfoWindow>
+          ) : null}
+        </GoogleMap>
+      )}
+    </div>
+  )
+}
+
 export function MapView() {
   const { data: properties = [], isLoading } = useProperties()
   const [filters, setFilters] = React.useState(defaultFilters)
@@ -380,96 +503,19 @@ export function MapView() {
 
   const selected = filtered.find((p) => p.id === selectedId)
 
-  const MapComponent = ({ height }: { height: string }) => (
-    <div className={`overflow-hidden rounded-2xl border border-white/10 ${height}`}>
-      {!apiKey ? (
-        <div className="flex h-full items-center justify-center text-sm text-slate-400">
-          Google Maps API key required.
-        </div>
-      ) : loadError ? (
-        <div className="flex h-full items-center justify-center text-sm text-red-300">
-          Failed to load map.
-        </div>
-      ) : !isLoaded ? (
-        <div className="flex h-full items-center justify-center text-sm text-slate-400">
-          Loading map...
-        </div>
-      ) : (
-        <GoogleMap
-          center={mapCenter}
-          zoom={12}
-          mapContainerClassName="h-full w-full"
-          onLoad={(map) => { mapRef.current = map }}
-          options={{
-            clickableIcons: false,
-            streetViewControl: false,
-            mapTypeControl: false,
-            fullscreenControl: false,
-          }}
-        >
-          {filtered.map((property) => (
-            <OverlayView
-              key={property.id}
-              position={property.coordinates}
-              mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-            >
-              <button
-                onClick={() => {
-                  setSelectedId(selectedId === property.id ? null : property.id)
-                  if (!showFullMap) setShowFullMap(true)
-                }}
-                style={{ transform: "translate(-50%, -100%)", whiteSpace: "nowrap" }}
-                className={`rounded-lg px-2.5 py-1 text-xs font-bold shadow-lg transition-transform hover:scale-105 ${
-                  selectedId === property.id
-                    ? "bg-orange-400 text-slate-900"
-                    : "bg-slate-900 text-white"
-                }`}
-              >
-                ${property.price.toLocaleString()}/mo
-              </button>
-            </OverlayView>
-          ))}
-          {selected && showFullMap ? (
-            <InfoWindow
-              position={selected.coordinates}
-              onCloseClick={() => setSelectedId(null)}
-              options={{ pixelOffset: new (window as any).google.maps.Size(0, -40) }}
-            >
-              <div className="w-56 overflow-hidden rounded-xl">
-                <img
-                  src={selected.images[0] ?? defaultImage}
-                  alt={selected.title}
-                  className="h-32 w-full object-cover"
-                />
-                <div className="space-y-1.5 p-3">
-                  <p className="text-sm font-semibold leading-tight text-slate-900">
-                    {selected.title}
-                  </p>
-                  <p className="text-sm font-bold text-slate-900">
-                    ${selected.price.toLocaleString()}/mo
-                  </p>
-                  <div className="flex gap-3 text-xs text-slate-600">
-                    <span className="flex items-center gap-1">
-                      <Bed size={12} /> {selected.bedrooms} Bed
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Bath size={12} /> {selected.bathrooms} Bath
-                    </span>
-                  </div>
-                  <Link
-                    to={`/properties/${selected.id}`}
-                    className="mt-2 block rounded-lg bg-slate-900 px-3 py-1.5 text-center text-xs font-semibold text-white hover:bg-slate-700"
-                  >
-                    View Details →
-                  </Link>
-                </div>
-              </div>
-            </InfoWindow>
-          ) : null}
-        </GoogleMap>
-      )}
-    </div>
-  )
+  const mapDisplayProps = {
+    apiKey,
+    loadError,
+    isLoaded,
+    mapCenter,
+    filtered,
+    selectedId,
+    showFullMap,
+    selected,
+    mapRef,
+    onSelectId: setSelectedId,
+    onShowFullMap: setShowFullMap,
+  }
 
   // Full screen map mode
   if (showFullMap) {
@@ -487,7 +533,7 @@ export function MapView() {
         </div>
 
         <div className="flex-1">
-          <MapComponent height="h-full" />
+          <MapDisplay height="h-full" {...mapDisplayProps} />
         </div>
 
         <div className="hidden w-80 flex-shrink-0 overflow-y-auto border-l border-white/10 bg-slate-950 p-4 lg:block">
@@ -505,6 +551,7 @@ export function MapView() {
                 <img
                   src={property.images[0] ?? defaultImage}
                   alt={property.title}
+                  onError={handlePropertyImageError}
                   className="h-28 w-full object-cover"
                 />
                 <div className="space-y-1 p-3">
@@ -546,7 +593,7 @@ export function MapView() {
 
       {/* Map */}
       <div className="relative">
-        <MapComponent height="h-64" />
+        <MapDisplay height="h-64" {...mapDisplayProps} />
         <button
           onClick={() => setShowFullMap(true)}
           className="absolute inset-0 flex items-center justify-center rounded-2xl bg-slate-900/30 transition hover:bg-slate-900/40"
