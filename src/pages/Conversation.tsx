@@ -9,15 +9,21 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useMarkThreadRead, useSendMessage, useThread } from "@/hooks/useThreads"
+import { useMarkAsLeased, useProperty } from "@/hooks/useProperties"
+import { useApp } from "@/context/AppContext"
 import { supabase } from "@/lib/supabase"
 
 export function Conversation() {
   const { threadId } = useParams()
   const { data: thread, isLoading } = useThread(threadId)
+  const { data: property } = useProperty(thread?.propertyId)
   const { mutateAsync: sendMessage } = useSendMessage()
   const { mutateAsync: markThreadRead } = useMarkThreadRead()
+  const { mutateAsync: markAsLeased, isPending: isMarkingLeased } = useMarkAsLeased()
+  const { currentUserId } = useApp()
   const [message, setMessage] = React.useState("")
   const [isSending, setIsSending] = React.useState(false)
+  const [showLeaseConfirm, setShowLeaseConfirm] = React.useState(false)
   const bottomRef = React.useRef<HTMLDivElement | null>(null)
   const queryClient = useQueryClient()
 
@@ -82,6 +88,23 @@ export function Conversation() {
     }
   }
 
+  const handleMarkLeased = async () => {
+    if (!property) return
+    try {
+      await markAsLeased(property.id)
+      toast.success("Lease marked as signed. Listing removed from public view.")
+      setShowLeaseConfirm(false)
+    } catch {
+      toast.error("Failed to mark lease as signed.")
+    }
+  }
+
+  const isOwner = Boolean(property && currentUserId && property.ownerId === currentUserId)
+  const alreadyLeased = property?.status === "leased"
+  const ownerSent = thread.messages.some((m) => m.sender === "You")
+  const otherSent = thread.messages.some((m) => m.sender !== "You")
+  const canMarkLeased = isOwner && !alreadyLeased && ownerSent && otherSent
+
   return (
     <div className="space-y-6">
       <Breadcrumb items={[{ label: "Inbox", href: "/inbox" }, { label: thread.participantName }]} />
@@ -90,6 +113,23 @@ export function Conversation() {
         title={thread.participantName}
         subtitle={thread.propertyTitle ?? "Direct thread"}
       />
+      {alreadyLeased && (
+        <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+          This listing has been marked as leased. It is no longer visible publicly, but you can keep chatting here.
+        </div>
+      )}
+      {canMarkLeased && (
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-orange-400/30 bg-orange-500/10 px-4 py-3 text-sm text-orange-100">
+          <span>Did you finalize the lease with {thread.participantName}?</span>
+          <Button
+            variant="secondary"
+            onClick={() => setShowLeaseConfirm(true)}
+            className="bg-orange-400 text-slate-900 hover:bg-orange-300"
+          >
+            Mark lease as signed
+          </Button>
+        </div>
+      )}
       <Card className="border border-white/10 bg-white/10">
         <CardContent className="flex h-[500px] flex-col">
           <div className="flex-1 space-y-4 overflow-y-auto pr-2">
@@ -128,6 +168,35 @@ export function Conversation() {
           </div>
         </CardContent>
       </Card>
+
+      {showLeaseConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4">
+          <div className="w-full max-w-md space-y-4 rounded-2xl border border-white/10 bg-slate-900 p-6 text-white">
+            <h3 className="text-lg font-semibold">Mark lease as signed?</h3>
+            <p className="text-sm text-slate-300">
+              This will remove "{property?.title ?? "this listing"}" from public search and the map.
+              You can still continue chatting with {thread.participantName} here. This action cannot
+              be undone from the chat.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setShowLeaseConfirm(false)}
+                disabled={isMarkingLeased}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleMarkLeased}
+                disabled={isMarkingLeased}
+                className="bg-orange-400 text-slate-900 hover:bg-orange-300"
+              >
+                {isMarkingLeased ? "Marking..." : "Confirm"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
