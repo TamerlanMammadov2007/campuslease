@@ -122,7 +122,6 @@ export function Conversation() {
         <div className="flex items-center justify-between gap-3 rounded-2xl border border-orange-400/30 bg-orange-500/10 px-4 py-3 text-sm text-orange-100">
           <span>Did you finalize the lease with {thread.participantName}?</span>
           <Button
-            variant="secondary"
             onClick={() => setShowLeaseConfirm(true)}
             className="bg-orange-400 text-slate-900 hover:bg-orange-300"
           >
